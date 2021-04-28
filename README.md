@@ -9,6 +9,7 @@ A simple Javascript UMD library for managing smart contract ABIs and Web3.js for
 - Built in ES6
 - Leverages Web3.js with all the standard benefits
 - Loads ABIs automatically through Etherscan
+- Compatible with [truffle-hdwallet-provider](https://github.com/trufflesuite/truffle-hdwallet-provider)
 
 ## Getting started
 
@@ -28,7 +29,7 @@ A simple Javascript UMD library for managing smart contract ABIs and Web3.js for
 ### 4. Copy and paste the Block3.min.js into your html
 
 - Copy and paste the /dist/Block3.min.js file into your html and reference the javascript files
-```
+```html
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -50,4 +51,73 @@ A simple Javascript UMD library for managing smart contract ABIs and Web3.js for
     <script type="text/javascript" src="js/Block3.min.js"></script>
   </body>
 </html>
+```
+
+## APIs
+
+### 1. Initialize the library
+
+- Reference library from window
+```javascript
+const { Block3 } = window;
+```
+- Set Provider (optional). Providers can use HDWalletProvider or set RPC url directly. Provider can be left empty and the library will default to ethereum
+```javascript
+
+let provider = "https://mainnet.infura.io/YOUR_INFURA_API_KEY"
+// or
+provider = new HDWalletProvider(
+  MNEMONIC,
+  RPC_URL
+);
+```
+- Initialize Block3 with provider and [Etherscan API Key](https://etherscan.io/apis)
+```javascript
+const block3 = new Block3({
+  provider,
+  apiKey: ETHERSCAN_API_KEY
+});
+```
+
+### 2. Load Smart Contract
+
+```javascript
+async initContract() {
+  try {
+    // Create contract with contract address, network and address
+    let contract = new block3.Contract({
+      address: CONTRACT_ADDRESS,
+      owner: OWNER_ADDRESS, // Optional parameter,
+      network: NETWORK
+    });
+    // Load contract
+    contract = await block3.loadContract(contract);
+    console.log(contract);
+  } catch (e) {
+    console.error(e);
+  }
+}
+```
+
+### 3. Execute contract methods
+```javascript
+async executeContractMethod() {
+  try {
+    // make a GET request
+    const res = await contract
+      .methods
+      .contractFunction()
+      .call({ from: contract.owner });
+    console.log(res);
+
+    // make a WRITE request
+    const res2 = await contract
+      .methods
+      .contractFunction()
+      .call({ from: contract.owner, value: <Amount to send to contract> });
+    console.log(res2);
+  } catch (e) {
+    console.error(e);
+  }
+}
 ```
