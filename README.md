@@ -9,7 +9,7 @@ A simple Javascript UMD library for managing smart contract ABIs and Web3.js for
 - Built in ES6
 - Leverages Web3.js with all the standard benefits
 - Loads ABIs automatically through Etherscan
-- Compatible with [hdwallet-provider](@truffle/hdwallet-provider)
+- Compatible with [hdwallet-provider](https://github.com/trufflesuite/truffle/tree/master/packages/hdwallet-provider#readme)
 
 ## Getting started
 
