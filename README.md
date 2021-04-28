@@ -114,7 +114,7 @@ async executeContractMethod() {
     const res2 = await contract
       .methods
       .contractFunction()
-      .call({ from: contract.owner, value: <Amount to send to contract> });
+      .send({ from: contract.owner, value: <Amount to send to contract> });
     console.log(res2);
   } catch (e) {
     console.error(e);
