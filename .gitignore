@@ -80,7 +80,6 @@ typings/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -93,8 +92,6 @@ dist
 
 # Serverless directories
 .serverless/
-
-lib
 
 # FuseBox cache
 .fusebox/
