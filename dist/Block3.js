@@ -57948,6 +57948,305 @@ exports.prefix = function prefix (multihash) {
 
 /***/ }),
 
+/***/ "./node_modules/nft.storage/src/lib.js":
+/*!*********************************************!*\
+  !*** ./node_modules/nft.storage/src/lib.js ***!
+  \*********************************************/
+/*! exports provided: NFTStorage, File, Blob, FormData */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NFTStorage", function() { return NFTStorage; });
+/* harmony import */ var _lib_interface_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/interface.js */ "./node_modules/nft.storage/src/lib/interface.js");
+/* harmony import */ var _lib_interface_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_lib_interface_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _platform_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./platform.js */ "./node_modules/nft.storage/src/platform.web.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "File", function() { return _platform_js__WEBPACK_IMPORTED_MODULE_1__["File"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Blob", function() { return _platform_js__WEBPACK_IMPORTED_MODULE_1__["Blob"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "FormData", function() { return _platform_js__WEBPACK_IMPORTED_MODULE_1__["FormData"]; });
+
+/**
+ * A client library for the https://nft.storage/ service. It provides a convenient
+ * interface for working with the [Raw HTTP API](https://nft.storage/#api-docs)
+ * from a web browser or [Node.js](https://nodejs.org/) and comes bundled with
+ * TS for out-of-the box type inference and better IntelliSense.
+ *
+ * @example
+ * ```js
+ * import { NFTStorage, File, Blob } from "nft.storage"
+ * const client = new NFTStorage({ token: API_TOKEN })
+ *
+ * const cid = await client.storeBlob(new Blob(['hello world']))
+ * ```
+ * @module
+ */
+
+
+
+
+/**
+ * @implements API.Service
+ */
+class NFTStorage {
+  /**
+   * Constructs a client bound to the given `options.token` and
+   * `options.endpoint`.
+   *
+   * @example
+   * ```js
+   * import { NFTStorage, File, Blob } from "nft.storage"
+   * const client = new NFTStorage({ token: API_TOKEN })
+   *
+   * const cid = await client.storeBlob(new Blob(['hello world']))
+   * ```
+   * Optionally you could pass an alternative API endpoint (e.g. for testing)
+   * @example
+   * ```js
+   * import { NFTStorage } from "nft.storage"
+   * const client = new NFTStorage({
+   *   token: API_TOKEN
+   *   endpoint: new URL('http://localhost:8080/')
+   * })
+   * ```
+   *
+   * @param {{token: string, endpoint?:URL}} options
+   */
+  constructor({ token, endpoint = new URL('https://nft.storage') }) {
+    /**
+     * Authorization token.
+     *
+     * @readonly
+     */
+    this.token = token
+    /**
+     * Service API endpoint `URL`.
+     * @readonly
+     */
+    this.endpoint = endpoint
+  }
+
+  /**
+   * @hidden
+   * @param {string} token
+   */
+  static auth(token) {
+    if (!token) throw new Error('missing token')
+    return { Authorization: `Bearer ${token}` }
+  }
+  /**
+   * @param {API.Service} service
+   * @param {Blob} blob
+   * @returns {Promise<API.CIDString>}
+   */
+  static async storeBlob({ endpoint, token }, blob) {
+    const url = new URL('/api/upload', endpoint)
+
+    const request = await Object(_platform_js__WEBPACK_IMPORTED_MODULE_1__["fetch"])(url.toString(), {
+      method: 'POST',
+      headers: NFTStorage.auth(token),
+      body: blob,
+    })
+    const result = await request.json()
+
+    if (result.ok) {
+      return result.value.cid
+    } else {
+      throw new Error(result.error.message)
+    }
+  }
+  /**
+   * @param {API.Service} service
+   * @param {Iterable<File>} files
+   * @returns {Promise<API.CIDString>}
+   */
+  static async storeDirectory({ endpoint, token }, files) {
+    const url = new URL('/api/upload', endpoint)
+    const body = new _platform_js__WEBPACK_IMPORTED_MODULE_1__["FormData"]()
+    for (const file of files) {
+      body.append('file', file, file.name)
+    }
+
+    const response = await Object(_platform_js__WEBPACK_IMPORTED_MODULE_1__["fetch"])(url.toString(), {
+      method: 'POST',
+      headers: NFTStorage.auth(token),
+      body,
+    })
+    const result = await response.json()
+
+    if (result.ok) {
+      return result.value.cid
+    } else {
+      throw new Error(result.error.message)
+    }
+  }
+
+  /**
+   * @param {API.Service} service
+   * @param {string} cid
+   * @returns {Promise<API.StatusResult>}
+   */
+  static async status({ endpoint, token }, cid) {
+    const url = new URL(`/api/${cid}`, endpoint)
+    const response = await Object(_platform_js__WEBPACK_IMPORTED_MODULE_1__["fetch"])(url.toString(), {
+      method: 'GET',
+      headers: NFTStorage.auth(token),
+    })
+    const result = await response.json()
+
+    if (result.ok) {
+      return {
+        cid: result.value.cid,
+        deals: result.value.deals,
+        size: result.value.size,
+        pin: result.value.pin,
+        created: new Date(result.value.created),
+      }
+    } else {
+      throw new Error(result.error.message)
+    }
+  }
+
+  /**
+   * @param {API.Service} service
+   * @param {string} cid
+   * @returns {Promise<void>}
+   */
+  static async delete({ endpoint, token }, cid) {
+    const url = new URL(`/api/${cid}`, endpoint)
+    const response = await Object(_platform_js__WEBPACK_IMPORTED_MODULE_1__["fetch"])(url.toString(), {
+      method: 'DELETE',
+      headers: NFTStorage.auth(token),
+    })
+    const result = await response.json()
+    if (!result.ok) {
+      throw new Error(result.error.message)
+    }
+  }
+
+  // Just a sugar so you don't have to pass around endpoint and token around.
+
+  /**
+   * Stores a single file and returns the corresponding Content Identifier (CID).
+   * Takes a [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob)
+   * or a [File](https://developer.mozilla.org/en-US/docs/Web/API/File). Note
+   * that no file name or file metadata is retained.
+   *
+   * @example
+   * ```js
+   * const content = new Blob(['hello world'])
+   * const cid = await client.storeBlob(content)
+   * cid //> 'Qmf412jQZiuVUtdgnB36FXFX7xg5V6KEbSJ4dpQuhkLyfD'
+   * ```
+   *
+   * @param {Blob} blob
+   */
+  storeBlob(blob) {
+    return NFTStorage.storeBlob(this, blob)
+  }
+  /**
+   * Stores a directory of files and returns a CID for the directory.
+   *
+   * @example
+   * ```js
+   * const cid = await client.storeDirectory([
+   *   new File(['hello world'], 'hello.txt'),
+   *   new File([JSON.stringify({'from': 'incognito'}, null, 2)], 'metadata.json')
+   * ])
+   * cid //>
+   * ```
+   *
+   * Argument can be a [FileList](https://developer.mozilla.org/en-US/docs/Web/API/FileList)
+   * instance as well, in which case directory structure will be retained.
+   *
+   * @param {Iterable<File>} files
+   */
+  storeDirectory(files) {
+    return NFTStorage.storeDirectory(this, files)
+  }
+  /**
+   * Returns current status of the stored content by its CID.
+   * @example
+   * ```js
+   * const status = await client.status('Qmf412jQZiuVUtdgnB36FXFX7xg5V6KEbSJ4dpQuhkLyfD')
+   * ```
+   *
+   * @param {string} cid
+   */
+  status(cid) {
+    return NFTStorage.status(this, cid)
+  }
+  /**
+   * Removes stored content by its CID from the service.
+   *
+   * > Please note that even if content is removed from the service other nodes
+   * that have replicated it might still continue providing it.
+   *
+   * @example
+   * ```js
+   * await client.delete('Qmf412jQZiuVUtdgnB36FXFX7xg5V6KEbSJ4dpQuhkLyfD')
+   * ```
+   *
+   * @param {string} cid
+   */
+  delete(cid) {
+    return NFTStorage.delete(this, cid)
+  }
+}
+
+
+
+/**
+ * Just to verify API compatibility.
+ * @type {API.API}
+ */
+const api = NFTStorage
+void api
+
+
+/***/ }),
+
+/***/ "./node_modules/nft.storage/src/lib/interface.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/nft.storage/src/lib/interface.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+
+/***/ }),
+
+/***/ "./node_modules/nft.storage/src/platform.web.js":
+/*!******************************************************!*\
+  !*** ./node_modules/nft.storage/src/platform.web.js ***!
+  \******************************************************/
+/*! exports provided: fetch, FormData, Headers, Request, Response, Blob, File, ReadableStream */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetch", function() { return fetch; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FormData", function() { return FormData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Headers", function() { return Headers; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Request", function() { return Request; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Response", function() { return Response; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blob", function() { return Blob; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "File", function() { return File; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ReadableStream", function() { return ReadableStream; });
+const fetch = globalThis.fetch
+const FormData = globalThis.FormData
+const Headers = globalThis.Headers
+const Request = globalThis.Request
+const Response = globalThis.Response
+const Blob = globalThis.Blob
+const File = globalThis.File
+const ReadableStream = globalThis.ReadableStream
+
+
+/***/ }),
+
 /***/ "./node_modules/node-libs-browser/node_modules/buffer/index.js":
 /*!*********************************************************************!*\
   !*** ./node_modules/node-libs-browser/node_modules/buffer/index.js ***!
@@ -98574,6 +98873,69 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/IPFS.js":
+/*!*********************!*\
+  !*** ./src/IPFS.js ***!
+  \*********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+const {
+  NFTStorage,
+  Blob
+} = __webpack_require__(/*! nft.storage */ "./node_modules/nft.storage/src/lib.js");
+
+class IPFSStorageManager {
+  constructor(apiKey) {
+    if (apiKey) {
+      this.client = new NFTStorage({
+        token: apiKey
+      });
+    } else throw new Error('NFTStorage apiKey must be provided');
+  }
+
+  upload(file) {
+    return this.client.storeDirectory([file]);
+  }
+
+  storeDataBlob(metadata) {
+    const content = new Blob([metadata]);
+    return client.storeBlob(content);
+  }
+
+  createNFTMetaDataTemplate(description, externalUrl, name, image, attributes) {
+    return JSON.stringify({
+      description,
+      external_url: externalUrl,
+      image,
+      name,
+      attributes
+    });
+  }
+
+  uploadAndGenerateMetaData(file, description, name, attributes, externalUrl, cb) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const fileCid = await this.upload(file);
+        if (cb) cb(0.5);
+        const meta = createNFTMetaDataTemplate(description, externalUrl, name, `https://ipfs.io/ipfs/${fileCid}/${file.name}`, attributes);
+        const metaCid = await this.storeDataBlob(meta);
+        if (cb) cb(1);
+        return resolve(`https://ipfs.io/ipfs/${metaCid}`);
+      } catch (e) {
+        return reject(e);
+      }
+    });
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (IPFSStorageManager);
+
+/***/ }),
+
 /***/ "./src/base.js":
 /*!*********************!*\
   !*** ./src/base.js ***!
@@ -98594,7 +98956,15 @@ class Base {
   }
 
   set(prop, value, constructor) {
-    if (value && value.constructor === constructor) {
+    const constructorValidator = value => {
+      if (constructor) {
+        return value.constructor === constructor;
+      }
+
+      return true;
+    };
+
+    if (value && constructorValidator(value)) {
       this._[prop] = value;
     }
   }
@@ -98614,24 +98984,24 @@ class Base {
 
 /***/ }),
 
-/***/ "./src/contract.js":
-/*!*************************!*\
-  !*** ./src/contract.js ***!
-  \*************************/
+/***/ "./src/contracts/erc20.js":
+/*!********************************!*\
+  !*** ./src/contracts/erc20.js ***!
+  \********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/base.js");
-/* harmony import */ var _ABI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ABI */ "./src/ABI.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/base.js");
+/* harmony import */ var _ABI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ABI */ "./src/ABI.js");
 /* harmony import */ var web3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! web3 */ "./node_modules/web3/lib/index.js");
 /* harmony import */ var web3__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(web3__WEBPACK_IMPORTED_MODULE_2__);
 
 
 
 
-class Contract extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+class ERC20 extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
   get address() {
     return this.get('address');
   }
@@ -98696,10 +99066,6 @@ class Contract extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     });
   }
 
-  tokenURI(address) {
-    return this.contract.methods.tokenURI(address).call();
-  }
-
   transferFrom(from, to, id) {
     return this.contract.methods.transferFrom(from, to, id).send({
       from: from
@@ -98714,12 +99080,34 @@ class Contract extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     return this.transferFrom(this.owner, to, id);
   }
 
+  transferOwnership(to) {
+    if (!this.owner) {
+      return Promise.reject(new Error("Owner is required"));
+    }
+
+    return this.contract.methods.transferOwnership(to).send({
+      from: this.owner
+    });
+  }
+
   totalSupply() {
     return this.contract.methods.totalSupply().call();
   }
 
-  getOwner(id) {
-    return this.contract.methods.owner(id).call();
+  ownerOf(id) {
+    return this.contract.methods.ownerOf(id).call();
+  }
+
+  balanceOf(address) {
+    return this.contract.methods.balanceOf(address).call();
+  }
+
+  name() {
+    return this.contract.methods.name().call();
+  }
+
+  symbol() {
+    return this.contract.methods.symbol().call();
   }
 
   export() {
@@ -98729,7 +99117,56 @@ class Contract extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 }
 
-/* harmony default export */ __webpack_exports__["default"] = (Contract);
+/* harmony default export */ __webpack_exports__["default"] = (ERC20);
+
+/***/ }),
+
+/***/ "./src/contracts/erc721.js":
+/*!*********************************!*\
+  !*** ./src/contracts/erc721.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _erc20__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./erc20 */ "./src/contracts/erc20.js");
+/* harmony import */ var _ABI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ABI */ "./src/ABI.js");
+/* harmony import */ var web3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! web3 */ "./node_modules/web3/lib/index.js");
+/* harmony import */ var web3__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(web3__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+
+class ERC721 extends _erc20__WEBPACK_IMPORTED_MODULE_0__["default"] {
+  tokenURI(address) {
+    return this.contract.methods.tokenURI(address).call();
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ERC721);
+
+/***/ }),
+
+/***/ "./src/contracts/index.js":
+/*!********************************!*\
+  !*** ./src/contracts/index.js ***!
+  \********************************/
+/*! exports provided: ERC20, ERC721 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _erc20__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./erc20 */ "./src/contracts/erc20.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ERC20", function() { return _erc20__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+/* harmony import */ var _erc721__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./erc721 */ "./src/contracts/erc721.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ERC721", function() { return _erc721__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+
+
+
+
 
 /***/ }),
 
@@ -98749,9 +99186,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var web3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! web3 */ "./node_modules/web3/lib/index.js");
 /* harmony import */ var web3__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(web3__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./src/utils/index.js");
-/* harmony import */ var _contract__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./contract */ "./src/contract.js");
+/* harmony import */ var _contracts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./contracts */ "./src/contracts/index.js");
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./base */ "./src/base.js");
 /* harmony import */ var _ABI__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ABI */ "./src/ABI.js");
+/* harmony import */ var _user__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./user */ "./src/user.js");
+/* harmony import */ var _IPFS__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./IPFS */ "./src/IPFS.js");
+
+
 
 
 
@@ -98763,22 +99204,31 @@ __webpack_require__.r(__webpack_exports__);
 class Block3 extends _base__WEBPACK_IMPORTED_MODULE_5__["default"] {
   constructor(options = {}) {
     super(options);
-    this.Contract = _contract__WEBPACK_IMPORTED_MODULE_4__["default"];
     this.contracts = {};
     const {
       ethereum
     } = window;
 
-    if (!this.provider) {
-      if (!ethereum) {
-        throw new Error('Non-Ethereum browser detected. You should consider trying MetaMask!');
-      }
-
-      this.provider = ethereum;
-      ethereum.enable();
+    if (!ethereum) {
+      throw new Error('Non-Ethereum browser detected. You should consider trying MetaMask!');
     }
 
+    this.provider = !this.provider ? ethereum : this.provider;
+    ethereum.enable();
+    this.user = new _user__WEBPACK_IMPORTED_MODULE_7__["default"](ethereum);
     this.web3 = new web3__WEBPACK_IMPORTED_MODULE_2___default.a(this.provider);
+  }
+
+  static get Contracts() {
+    return Contract;
+  }
+
+  static get providers() {
+    return web3__WEBPACK_IMPORTED_MODULE_2___default.a.providers;
+  }
+
+  static get IPFSStorageManager() {
+    return _IPFS__WEBPACK_IMPORTED_MODULE_8__["default"];
   }
 
   get apiKey() {
@@ -98805,6 +99255,14 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_5__["default"] {
     this.set('contracts', c, Object);
   }
 
+  get user() {
+    return this.get('user');
+  }
+
+  set user(u) {
+    this.set('user', u, _user__WEBPACK_IMPORTED_MODULE_7__["default"]);
+  }
+
   get xhr() {
     return this.get('xhr');
   }
@@ -98822,15 +99280,24 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_5__["default"] {
 
   loadContract(contract, gasLimit = "100000") {
     return new Promise(async (resolve, reject) => {
-      if (!this.apiKey || !contract.network || !contract.address) {
-        return reject(new Error('apiKey and contract network, contract address must be set in order to load the contract.'));
+      if (!contract.network || !contract.address) {
+        return reject(new Error('contract network, contract address must be set in order to load the contract.'));
       }
 
       try {
-        contract.abi = await Object(_ABI__WEBPACK_IMPORTED_MODULE_6__["default"])(contract.address, this.apiKey, contract.network, this.xhr);
-        contract.contract = new this.web3.eth.Contract(contract.abi, contract.address, {
+        if (!contract.abi) {
+          if (!this.apiKey) {
+            return reject(new Error('apiKey or contract.abi must be set in order to load the contract.'));
+          }
+
+          contract.abi = await Object(_ABI__WEBPACK_IMPORTED_MODULE_6__["default"])(contract.address, this.apiKey, contract.network, this.xhr);
+        }
+
+        const newContract = new this.web3.eth.Contract(contract.abi, contract.address, {
           gasLimit
         });
+        console.log(newContract);
+        contract.contract = newContract;
         this.contracts[contract.address] = contract;
         return resolve(contract);
       } catch (e) {
@@ -98862,6 +99329,50 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_5__["default"] {
 
 /* harmony default export */ __webpack_exports__["default"] = (Block3);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../node_modules/webpack/buildin/harmony-module.js */ "./node_modules/webpack/buildin/harmony-module.js")(module)))
+
+/***/ }),
+
+/***/ "./src/user.js":
+/*!*********************!*\
+  !*** ./src/user.js ***!
+  \*********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class User {
+  /**
+   * Constructor Method
+   * @param {Object} options options to apply on initialization
+   */
+  constructor(ethereum) {
+    this.ethereum = ethereum;
+  }
+  /**
+   * PROPERTIES
+   */
+
+
+  accounts() {
+    return this.ethereum.request({
+      method: 'eth_requestAccounts'
+    });
+  }
+  /**
+   * [onRequest description]
+   * @param  {Function} cb [description]
+   * @return {[type]}      [description]
+   */
+
+
+  onAccountSwitch(cb) {
+    return this.ethereum.on('accountsChanged', cb);
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (User);
 
 /***/ }),
 

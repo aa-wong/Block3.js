@@ -2,26 +2,37 @@ import 'babel-register';
 import 'idempotent-babel-polyfill';
 import Web3 from 'web3';
 import { Http } from './utils';
-import Contract from './contract';
+import Contracts from './contracts';
 import Base from './base';
 import ABI from './ABI';
+import User from './user';
+import IPFSStorageManager from './IPFS';
 
 class Block3 extends Base {
   constructor(options = {}) {
     super(options);
-    this.Contract = Contract;
     this.contracts = {};
-
     const { ethereum } = window;
 
-    if (!this.provider) {
-      if (!ethereum) {
-        throw new Error('Non-Ethereum browser detected. You should consider trying MetaMask!');
-      }
-      this.provider = ethereum;
-      ethereum.enable();
+    if (!ethereum) {
+      throw new Error('Non-Ethereum browser detected. You should consider trying MetaMask!');
     }
+    this.provider = !this.provider ? ethereum : this.provider;
+    ethereum.enable();
+    this.user = new User(ethereum);
     this.web3 = new Web3(this.provider);
+  }
+
+  static get Contracts() {
+    return Contract;
+  }
+
+  static get providers() {
+    return Web3.providers;
+  }
+
+  static get IPFSStorageManager() {
+    return IPFSStorageManager;
   }
 
   get apiKey() {
@@ -48,6 +59,14 @@ class Block3 extends Base {
     this.set('contracts', c, Object);
   }
 
+  get user() {
+    return this.get('user');
+  }
+
+  set user(u) {
+    this.set('user', u, User);
+  }
+
   get xhr() {
     return this.get('xhr');
   }
@@ -63,14 +82,20 @@ class Block3 extends Base {
 
   loadContract(contract, gasLimit="100000") {
     return new Promise(async(resolve, reject) => {
-      if (!this.apiKey || !contract.network || !contract.address) {
-        return reject(new Error('apiKey and contract network, contract address must be set in order to load the contract.'));
+      if (!contract.network || !contract.address) {
+        return reject(new Error('contract network, contract address must be set in order to load the contract.'));
       }
 
       try {
-        contract.abi = await ABI(contract.address, this.apiKey, contract.network, this.xhr);
-
-        contract.contract = new this.web3.eth.Contract(contract.abi, contract.address, { gasLimit });
+        if (!contract.abi) {
+          if (!this.apiKey) {
+            return reject(new Error('apiKey or contract.abi must be set in order to load the contract.'));
+          }
+          contract.abi = await ABI(contract.address, this.apiKey, contract.network, this.xhr);
+        }
+        const newContract = new this.web3.eth.Contract(contract.abi, contract.address, { gasLimit });
+        console.log(newContract);
+        contract.contract = newContract;
         this.contracts[contract.address] = contract;
         return resolve(contract);
       } catch (e) {

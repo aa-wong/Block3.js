@@ -1,30 +1,53 @@
+const {
+  NFTStorage,
+  Blob
+} = require('nft.storage');
 
-const { NFTStorage, Blob } = require('nft.storage');
-const IPFS_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnaXRodWJ8MTQyOTYxNzYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYxNjgwMzE1NjQ4MCwibmFtZSI6ImRlZmF1bHQifQ.JgqVsl3CfCtctrihSN7U2LClQ6AejnY0BeulY7v5R2g';
-const client = new NFTStorage({ token: IPFS_API_KEY });
+class IPFSStorageManager {
+  constructor(apiKey) {
+    if (apiKey) {
+      this.client = new NFTStorage({ token: apiKey });
+    } else throw new Error('NFTStorage apiKey must be provided');
+  }
 
-const IPFS = (file, description, name, attributes, cb) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const fileCid = await client.storeDirectory([file]);
+  upload(file) {
+    return this.client.storeDirectory([file]);
+  }
 
-      const metadata = JSON.stringify({
-        description,
-        external_url: "https://nifty-bot-marketplace.web.app/",
-        image: `https://ipfs.io/ipfs/${fileCid}/${file.name}`,
-        name,
-        attributes
-      });
-      cb(0.5);
-      const content = new Blob([metadata]);
-      const cid = await client.storeBlob(content);
+  storeDataBlob(metadata) {
+    const content = new Blob([metadata]);
+    return client.storeBlob(content);
+  }
 
-      resolve(`https://ipfs.io/ipfs/${cid}`);
-      return cb(1);
-    } catch (e) {
-      return reject(e);
-    }
-  });
+  createNFTMetaDataTemplate(description, externalUrl, name, image, attributes) {
+    return JSON.stringify({
+      description,
+      external_url: externalUrl,
+      image,
+      name,
+      attributes
+    });
+  }
+
+  uploadAndGenerateMetaData(file, description, name, attributes, externalUrl, cb) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const fileCid = await this.upload(file);
+        if (cb) cb(0.5);
+        const meta = createNFTMetaDataTemplate(
+          description,
+          externalUrl,
+          name,
+          `https://ipfs.io/ipfs/${fileCid}/${file.name}`,
+          attributes);
+        const metaCid = await this.storeDataBlob(meta);
+        if (cb) cb(1);
+        return resolve(`https://ipfs.io/ipfs/${metaCid}`);
+      } catch (e) {
+        return reject(e);
+      }
+    });
+  }
 }
 
-export default IPFS;
+export default IPFSStorageManager;

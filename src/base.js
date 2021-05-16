@@ -9,7 +9,13 @@ class Base {
   }
 
   set(prop, value, constructor) {
-    if (value && value.constructor === constructor) {
+    const constructorValidator = (value) => {
+      if (constructor) {
+        return value.constructor === constructor
+      }
+      return true;
+    }
+    if (value && constructorValidator(value)) {
       this._[prop] = value;
     }
   }
