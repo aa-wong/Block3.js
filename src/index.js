@@ -24,7 +24,7 @@ class Block3 extends Base {
   }
 
   static get Contracts() {
-    return Contract;
+    return Contracts;
   }
 
   static get providers() {
