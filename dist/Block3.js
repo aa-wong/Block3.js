@@ -99153,20 +99153,28 @@ class ERC721 extends _erc20__WEBPACK_IMPORTED_MODULE_0__["default"] {
 /*!********************************!*\
   !*** ./src/contracts/index.js ***!
   \********************************/
-/*! exports provided: ERC20, ERC721 */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _erc20__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./erc20 */ "./src/contracts/erc20.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ERC20", function() { return _erc20__WEBPACK_IMPORTED_MODULE_0__["default"]; });
-
 /* harmony import */ var _erc721__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./erc721 */ "./src/contracts/erc721.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ERC721", function() { return _erc721__WEBPACK_IMPORTED_MODULE_1__["default"]; });
 
 
 
+class Contracts {
+  static get ERC20() {
+    return _erc20__WEBPACK_IMPORTED_MODULE_0__["default"];
+  }
 
+  static get ERC721() {
+    return _erc721__WEBPACK_IMPORTED_MODULE_1__["default"];
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Contracts);
 
 /***/ }),
 
