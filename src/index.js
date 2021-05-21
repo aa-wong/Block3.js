@@ -17,7 +17,7 @@ class Block3 extends Base {
     if (!ethereum) {
       throw new Error('Non-Ethereum browser detected. You should consider trying MetaMask!');
     }
-    this.provider = !this.provider ? ethereum : this.provider;
+    this.provider = this.provider === undefined ? ethereum : this.provider;
     ethereum.enable();
     this.user = new User(ethereum);
     this.web3 = new Web3(this.provider);
@@ -48,7 +48,7 @@ class Block3 extends Base {
   }
 
   set provider(p) {
-    this.set('provider', p, String);
+    this.set('provider', p);
   }
 
   get contracts() {
@@ -94,7 +94,7 @@ class Block3 extends Base {
           contract.abi = await ABI(contract.address, this.apiKey, contract.network, this.xhr);
         }
         const newContract = new this.web3.eth.Contract(contract.abi, contract.address, { gasLimit });
-        console.log(newContract);
+
         contract.contract = newContract;
         this.contracts[contract.address] = contract;
         return resolve(contract);

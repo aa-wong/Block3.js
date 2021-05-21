@@ -99221,7 +99221,7 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_5__["default"] {
       throw new Error('Non-Ethereum browser detected. You should consider trying MetaMask!');
     }
 
-    this.provider = !this.provider ? ethereum : this.provider;
+    this.provider = this.provider === undefined ? ethereum : this.provider;
     ethereum.enable();
     this.user = new _user__WEBPACK_IMPORTED_MODULE_7__["default"](ethereum);
     this.web3 = new web3__WEBPACK_IMPORTED_MODULE_2___default.a(this.provider);
@@ -99252,7 +99252,7 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_5__["default"] {
   }
 
   set provider(p) {
-    this.set('provider', p, String);
+    this.set('provider', p);
   }
 
   get contracts() {
@@ -99304,7 +99304,6 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         const newContract = new this.web3.eth.Contract(contract.abi, contract.address, {
           gasLimit
         });
-        console.log(newContract);
         contract.contract = newContract;
         this.contracts[contract.address] = contract;
         return resolve(contract);
@@ -99744,8 +99743,6 @@ class Http {
       }
 
       this._handleRequest(request);
-
-      console.log(request);
 
       try {
         const res = await httpSession(this.xhr, request, this._callbacks);

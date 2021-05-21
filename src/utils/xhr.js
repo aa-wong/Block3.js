@@ -310,8 +310,6 @@ class Http {
       }
       this._handleRequest(request);
 
-      console.log(request);
-
       try {
         const res = await httpSession(this.xhr, request, this._callbacks);
 
