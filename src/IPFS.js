@@ -16,7 +16,7 @@ class IPFSStorageManager {
 
   storeDataBlob(metadata) {
     const content = new Blob([metadata]);
-    return client.storeBlob(content);
+    return this.client.storeBlob(content);
   }
 
   createNFTMetaDataTemplate(description, externalUrl, name, image, attributes) {
@@ -34,7 +34,7 @@ class IPFSStorageManager {
       try {
         const fileCid = await this.upload(file);
         if (cb) cb(0.5);
-        const meta = createNFTMetaDataTemplate(
+        const meta = this.createNFTMetaDataTemplate(
           description,
           externalUrl,
           name,
@@ -42,7 +42,7 @@ class IPFSStorageManager {
           attributes);
         const metaCid = await this.storeDataBlob(meta);
         if (cb) cb(1);
-        return resolve(`https://ipfs.io/ipfs/${metaCid}`);
+        return resolve(metaCid);
       } catch (e) {
         return reject(e);
       }

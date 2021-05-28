@@ -1,8 +1,8 @@
 const webpack = require('webpack');
-const mode = require('yargs').argv.mode;
-const libraryTarget = require('yargs').argv['output-library-target'];
+const { argv } = require('yargs')
+const mode = argv.mode;
+const libraryTarget = argv['output-library-target'];
 const pkg = require('./package.json');
-
 const libraryName = pkg.name;
 
 const banner = `${pkg.name}
