@@ -6,7 +6,7 @@ export default (address, apiKey, network, xhr) => {
     let chain = 'api';
 
     if (xhr) http.xhr = xhr;
-    if (network || network !== 'mainnet') chain += `-${network}`;
+    if (network && network !== 'mainnet') chain += `-${network}`;
     http.host = `https://${chain}.etherscan.io`;
 
     try {
