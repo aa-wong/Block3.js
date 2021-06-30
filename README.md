@@ -135,13 +135,16 @@ const ipfs = new IPFSStorageManager('< nft.storage api key >');
 // Uploade image file and any additional meta-data to upload to ipfs
 async function upload() {
   try {
+    // meta data parameters
     const imageFile = < image file >;
     const description = 'nft description';
     const name = 'nft name';
     const attributes = [{'nft': 'attribute'}];
     const externalUrl = '< nft external url >';
+
     // returns cid that can be referenced in ipfs
     const cid = await ipfs.uploadAndGenerateMetaData(imageFile, description, name, attributes, externalUrl);
+ 
     // delete data from ipfs by cid
     await ipfs.deleteMetaData(cid, cb);
   } catch (e) {
