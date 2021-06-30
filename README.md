@@ -63,10 +63,12 @@ const { Block3 } = window;
 ```
 - Set Provider (optional). Providers can use HDWalletProvider or set RPC url directly. Provider can be left empty and the library will default to ethereum
 ```javascript
+const { providers } = window.Block3;
+const { HttpProvider } = providers;
 
-let provider = "https://mainnet.infura.io/YOUR_INFURA_API_KEY"
+const provider = new HttpProvider("https://mainnet.infura.io/YOUR_INFURA_API_KEY");
 // or
-provider = new HDWalletProvider(
+const provider = new HDWalletProvider(
   MNEMONIC,
   RPC_URL
 );
