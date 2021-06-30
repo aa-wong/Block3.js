@@ -136,7 +136,7 @@ const ipfs = new IPFSStorageManager('< nft.storage api key >');
 async function upload() {
   try {
     // meta data parameters
-    const imageFile = < image file >;
+    const imageFile = '< image file >';
     const description = 'nft description';
     const name = 'nft name';
     const attributes = [{'nft': 'attribute'}];
