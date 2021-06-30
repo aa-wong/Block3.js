@@ -86,8 +86,10 @@ const block3 = new Block3({
 ```javascript
 async function initContract() {
   try {
+    const { Contracts } = window.Block3;
+    const { ERC20 } = Contracts;
     // Create contract with contract address, network and address
-    let contract = new block3.Contract({
+    let contract = new ERC20({
       address: CONTRACT_ADDRESS,
       owner: OWNER_ADDRESS, // Optional parameter,
       network: NETWORK
