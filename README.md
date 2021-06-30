@@ -84,7 +84,7 @@ const block3 = new Block3({
 ### 2. Load Smart Contract
 
 ```javascript
-async initContract() {
+async function initContract() {
   try {
     // Create contract with contract address, network and address
     let contract = new block3.Contract({
@@ -103,7 +103,7 @@ async initContract() {
 
 ### 3. Execute contract methods
 ```javascript
-async executeContractMethod() {
+async function executeContractMethod() {
   try {
     // make a GET request
     const res = await contract
@@ -118,6 +118,32 @@ async executeContractMethod() {
       .contractFunction()
       .send({ from: contract.owner, value: <Amount to send to contract> });
     console.log(res2);
+  } catch (e) {
+    console.error(e);
+  }
+}
+```
+
+### 4. IPFS nft.storage
+Reference and initialize IPFSStorageManager
+
+```javascript
+const { IPFSStorageManager } = Block3;
+
+const ipfs = new IPFSStorageManager('< nft.storage api key >');
+
+// Uploade image file and any additional meta-data to upload to ipfs
+async function upload() {
+  try {
+    const imageFile = < image file >;
+    const description = 'nft description';
+    const name = 'nft name';
+    const attributes = [{'nft': 'attribute'}];
+    const externalUrl = '< nft external url >';
+    // returns cid that can be referenced in ipfs
+    const cid = await ipfs.uploadAndGenerateMetaData(imageFile, description, name, attributes, externalUrl);
+    // delete data from ipfs by cid
+    await ipfs.deleteMetaData(cid, cb);
   } catch (e) {
     console.error(e);
   }
