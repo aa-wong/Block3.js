@@ -128,7 +128,7 @@ async function executeContractMethod() {
 Reference and initialize IPFSStorageManager
 
 ```javascript
-const { IPFSStorageManager } = Block3;
+const { IPFSStorageManager } = window.Block3;
 
 const ipfs = new IPFSStorageManager('< nft.storage api key >');
 
