@@ -1,6 +1,8 @@
-# Block3JS
+![Block3.js](https://github.com/aa-wong/Block3.js/blob/main/block3js-logo-background.png)
 
-A simple Javascript UMD library for managing smart contract ABIs and Web3.js for the front-end
+## Philosophy
+
+A simple Javascript UMD library for managing smart contract ABIs and Web3.js for the front-end.
 
 ## Features
 
@@ -8,7 +10,8 @@ A simple Javascript UMD library for managing smart contract ABIs and Web3.js for
 - Export smart contracts for caching purposes
 - Built in ES6
 - Leverages Web3.js with all the standard benefits
-- Loads ABIs automatically through Etherscan
+- Automatic ABI injection from Etherscan
+- Supports IPFS uploads through nft.storage
 - Compatible with [hdwallet-provider](https://github.com/trufflesuite/truffle/tree/master/packages/hdwallet-provider#readme)
 
 ## Getting started
@@ -146,7 +149,7 @@ async function upload() {
 
     // returns cid that can be referenced in ipfs
     const cid = await ipfs.uploadAndGenerateMetaData(imageFile, description, name, attributes, externalUrl);
- 
+
     // delete data from ipfs by cid
     await ipfs.deleteMetaData(cid, cb);
   } catch (e) {
