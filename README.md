@@ -63,10 +63,12 @@ const { Block3 } = window;
 ```
 - Set Provider (optional). Providers can use HDWalletProvider or set RPC url directly. Provider can be left empty and the library will default to ethereum
 ```javascript
+const { providers } = window.Block3;
+const { HttpProvider } = providers;
 
-let provider = "https://mainnet.infura.io/YOUR_INFURA_API_KEY"
+const provider = new HttpProvider("https://mainnet.infura.io/YOUR_INFURA_API_KEY");
 // or
-provider = new HDWalletProvider(
+const provider = new HDWalletProvider(
   MNEMONIC,
   RPC_URL
 );
@@ -82,10 +84,12 @@ const block3 = new Block3({
 ### 2. Load Smart Contract
 
 ```javascript
-async initContract() {
+async function initContract() {
   try {
+    const { Contracts } = window.Block3;
+    const { ERC20 } = Contracts;
     // Create contract with contract address, network and address
-    let contract = new block3.Contract({
+    let contract = new ERC20({
       address: CONTRACT_ADDRESS,
       owner: OWNER_ADDRESS, // Optional parameter,
       network: NETWORK
@@ -101,7 +105,7 @@ async initContract() {
 
 ### 3. Execute contract methods
 ```javascript
-async executeContractMethod() {
+async function executeContractMethod() {
   try {
     // make a GET request
     const res = await contract
@@ -116,6 +120,35 @@ async executeContractMethod() {
       .contractFunction()
       .send({ from: contract.owner, value: <Amount to send to contract> });
     console.log(res2);
+  } catch (e) {
+    console.error(e);
+  }
+}
+```
+
+### 4. IPFS nft.storage
+Reference and initialize IPFSStorageManager
+
+```javascript
+const { IPFSStorageManager } = window.Block3;
+
+const ipfs = new IPFSStorageManager('< nft.storage api key >');
+
+// Uploade image file and any additional meta-data to upload to ipfs
+async function upload() {
+  try {
+    // meta data parameters
+    const imageFile = '< image file >';
+    const description = 'nft description';
+    const name = 'nft name';
+    const attributes = [{'nft': 'attribute'}];
+    const externalUrl = '< nft external url >';
+
+    // returns cid that can be referenced in ipfs
+    const cid = await ipfs.uploadAndGenerateMetaData(imageFile, description, name, attributes, externalUrl);
+ 
+    // delete data from ipfs by cid
+    await ipfs.deleteMetaData(cid, cb);
   } catch (e) {
     console.error(e);
   }
