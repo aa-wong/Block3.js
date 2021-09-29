@@ -80,7 +80,18 @@ class Block3 extends Base {
     return ethereum;
   }
 
-  loadContract(contract, gasLimit="100000") {
+  async gasLimit() {
+    try {
+      const block = await this.web3.eth.getBlock("latest");
+
+      console.log(block);
+      return Promise.resolve(block.gasLimit);
+    } catch (e) {
+      return Promise.reject(e)
+    }
+  }
+
+  loadContract(contract, gasLimit) {
     return new Promise(async(resolve, reject) => {
       if (!contract.network || !contract.address) {
         return reject(new Error('contract network, contract address must be set in order to load the contract.'));
@@ -93,6 +104,9 @@ class Block3 extends Base {
           }
           contract.abi = await ABI(contract.address, this.apiKey, contract.network, this.xhr);
         }
+        if (!gasLimit) gasLimit = await this.gasLimit();
+        console.log(gasLimit);
+
         const newContract = new this.web3.eth.Contract(contract.abi, contract.address, { gasLimit });
 
         contract.contract = newContract;
