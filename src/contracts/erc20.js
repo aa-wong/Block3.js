@@ -1,52 +1,6 @@
-import Base from '../base';
-import ABI from '../ABI';
-import Web3 from 'web3';
+import Contract from './contract';
 
-class ERC20 extends Base {
-  get address() {
-    return this.get('address');
-  }
-
-  set address(a) {
-    this.set('address', a, String);
-  }
-
-  get owner() {
-    return this.get('owner');
-  }
-
-  set owner(o) {
-    this.set('owner', o, String);
-  }
-
-  get network() {
-    return this.get('network');
-  }
-
-  set network(n) {
-    this.set('network', n, String);
-  }
-
-  get abi() {
-    return this.get('abi');
-  }
-
-  set abi(abi) {
-    this.set('abi', abi, Array);
-  }
-
-  get contract() {
-    return this.get('contract');
-  }
-
-  set contract(c) {
-    this.set('contract', c);
-  }
-
-  get methods() {
-    return this.contract.methods;
-  }
-
+class ERC20 extends Contract {
   burn(tokenId) {
     if (!this.owner) {
       return Promise.reject(new Error("Owner is required"));
@@ -124,11 +78,6 @@ class ERC20 extends Base {
       .methods
       .symbol()
       .call();
-  }
-
-  export() {
-    this._['contract'] = undefined;
-    return super.export();
   }
 }
 
