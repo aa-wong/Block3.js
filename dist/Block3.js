@@ -99107,8 +99107,6 @@ class Contract extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   _callMethod(method, from, args) {
-    console.log('call method');
-
     if (args && args.length > 0) {
       return this.contract.methods[method](...args).call({
         from
@@ -99122,7 +99120,6 @@ class Contract extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   _sendMethod(method, from, args, value) {
     if (args && args.length > 0) {
-      console.log(...args);
       return this.contract.methods[method](...args).send({
         from,
         value
