@@ -59,11 +59,11 @@ class Contract extends Base {
     this.set('miscellaneous', m, Array);
   }
 
-  execute(m, from, args, value) {
+  async execute(m, from, args, value) {
     if (m.payable || m.inputs.length > 0) {
       return this._sendMethod(m.name, from, args, value);
     }
-    return this._callMethod(m.name, from, args)
+    return this._callMethod(m.name, from, args);
   }
 
   export() {
