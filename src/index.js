@@ -5,8 +5,9 @@ import { Http } from './utils';
 import Contracts from './contracts';
 import Base from './base';
 import ABI from './ABI';
-import User from './user';
 import IPFSStorageManager from './IPFS';
+import TransactionManager from './transaction';
+import User from './user';
 
 class Block3 extends Base {
   constructor(options = {}) {
@@ -21,6 +22,7 @@ class Block3 extends Base {
     ethereum.enable();
     this.user = new User(ethereum);
     this.web3 = new Web3(this.provider);
+    this.transaction = new TransactionManager(this.web3);
   }
 
   static get Contracts() {
@@ -77,6 +79,7 @@ class Block3 extends Base {
 
   get ethereum() {
     const { ethereum } = window;
+
     return ethereum;
   }
 
@@ -85,27 +88,6 @@ class Block3 extends Base {
       const block = this.web3.eth.getBlock("latest");
 
       return Promise.resolve(block.gasLimit);
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }
-
-  getTransactionByHash(txHash) {
-    return this.web3.eth.getTransaction(txHash);
-  }
-
-  async parseTransactionDetails(tx) {
-    try {
-      let result = await this.web3.eth.call(tx, tx.blockNumber);
-
-      result = result.startsWith('0x') ? result : `0x${result}`;
-      if (result && result.substr(138)) {
-        const reason = this.web3.utils.toAscii(result.substr(138));
-
-        return Promise.resolve(reason);
-      } else {
-        return Promise.resolve('Transaction details not found - No return value');
-      }
     } catch (e) {
       return Promise.reject(e);
     }
