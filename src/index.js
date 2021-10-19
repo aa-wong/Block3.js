@@ -107,12 +107,48 @@ class Block3 extends Base {
         const newContract = new this.web3.eth.Contract(contract.abi, contract.address, { gasLimit });
 
         contract.contract = newContract;
+        const {
+          methods,
+          events,
+          miscellaneous
+        } = this._parseABI(contract);
+        contract._setMethods(methods);
+        contract.events = events;
+        contract.miscellaneous = miscellaneous;
         this.contracts[contract.address] = contract;
         return resolve(contract);
       } catch (e) {
         return reject(e);
       }
     });
+  }
+
+  _parseABI(contract) {
+    const {
+      abi,
+      _callMethod,
+      _sendMethod
+    } = contract;
+
+    if (!abi) {
+      return [];
+    }
+
+    const methods = [];
+    const events = [];
+    const miscellaneous = [];
+
+    for (let m of abi) {
+      if (!m.type) miscellaneous.push(m);
+      if (m.type === 'function') methods.push(m);
+      else if (m.type === 'event') events.push(m);
+    }
+
+    return {
+      methods,
+      events,
+      miscellaneous
+    }
   }
 
   getContract(address) {

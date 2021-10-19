@@ -36,12 +36,63 @@ class Contract extends Base {
   }
 
   get methods() {
-    return this.contract.methods;
+    return this.get('methods', {});
+  }
+
+  set methods(m) {
+    this.set('methods', m, Object);
+  }
+
+  get events() {
+    return this.get('events', []);
+  }
+
+  set events(m) {
+    this.set('events', m, Array);
+  }
+
+  get miscellaneous() {
+    return this.get('miscellaneous', []);
+  }
+
+  set miscellaneous(m) {
+    this.set('miscellaneous', m, Array);
+  }
+
+  execute(m, from, args, value) {
+    if (m.payable || m.inputs.length > 0) {
+      return this._sendMethod(m.name, from, args, value);
+    }
+    return this._callMethod(m.name, from, args)
   }
 
   export() {
     this._['contract'] = undefined;
+    this._['methods'] = undefined;
     return super.export();
+  }
+
+  _setMethods(m) {
+    this.methods = m.reduce((a, c) => {
+      a[c.name] = c;
+      return a;
+    }, {});
+  }
+
+  _callMethod(method, from, args) {
+    console.log('call method');
+    if (args && args.length > 0) {
+      return this.contract.methods[method](...args).call({ from });
+    }
+    return this.contract.methods[method]().call({ from });
+  }
+
+  _sendMethod(method, from, args, value) {
+    if (args && args.length > 0) {
+      console.log(...args);
+      return this.contract.methods[method](...args).send({ from, value });
+    }
+    return this.contract.methods[method]().send({ from, value });
   }
 }
 

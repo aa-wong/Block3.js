@@ -23,7 +23,7 @@
     "prepare": "npm-run-all clean build"
   },
   "keywords": [],
-  "author": "Aaron Wong <aaron@pcreationsbyawe.com>",
+  "author": "Aaron Wong <aaron@creationsbyawe.com>",
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-object-rest-spread": "~7.5.5",
