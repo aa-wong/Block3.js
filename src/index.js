@@ -1,11 +1,12 @@
 import 'babel-register';
 import 'idempotent-babel-polyfill';
 import Web3 from 'web3';
-import { Http } from './utils';
 import Contracts from './contracts';
-import Base from './base';
+import { Http } from './utils';
 import ABI from './ABI';
-import IPFSStorageManager from './IPFS';
+import Base from './base';
+import ENSManager from './ens';
+import IPFSStorageManager from './ipfs';
 import TransactionManager from './transaction';
 import User from './user';
 
@@ -22,6 +23,7 @@ class Block3 extends Base {
     ethereum.enable();
     this.user = new User(ethereum);
     this.web3 = new Web3(this.provider);
+    this.ens = new ENSManager(this.web3, this.provider);
     this.transaction = new TransactionManager(this.web3);
   }
 

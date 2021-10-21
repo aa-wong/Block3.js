@@ -46,12 +46,15 @@
   },
   "browserslist": "> 0.5%, last 2 versions, Firefox ESR, not dead",
   "dependencies": {
+    "@ensdomains/ensjs": "^2.0.1",
     "@truffle/hdwallet-provider": "^1.5.1",
     "babel-register": "^6.26.0",
     "buffer": "^6.0.3",
     "dotenv": "^8.6.0",
+    "i": "^0.3.7",
     "idempotent-babel-polyfill": "^7.4.4",
     "nft.storage": "^0.4.1",
+    "npm": "^8.1.0",
     "web3": "^1.6.0"
   }
 }

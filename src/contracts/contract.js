@@ -59,11 +59,31 @@ class Contract extends Base {
     this.set('miscellaneous', m, Array);
   }
 
-  async execute(m, from, args, value) {
-    if (m.payable || m.inputs.length > 0) {
-      return this._sendMethod(m.name, from, args, value);
+  async execute(method, from, args, value) {
+    if (!method || !from) {
+      return Promise.reject(new Error('method and from parameters are required.'));
     }
-    return this._callMethod(m.name, from, args);
+
+    const {
+      constant,
+      inputs,
+      name,
+      payable,
+    } = method;
+
+    if (inputs.length > 0 && args.length !== inputs.length) {
+      return Promise.reject(new Error('Invalid number of arguments provided.'));
+    }
+
+    if (constant) {
+      return this._callMethod(name, from, args);
+    }
+
+    if (payable && !value) {
+      return Promise.reject(new Error('Payable methods requires value parameter to be provided.'));
+    }
+
+    return this._sendMethod(name, from, args, value);
   }
 
   export() {
@@ -80,6 +100,9 @@ class Contract extends Base {
   }
 
   _callMethod(method, from, args) {
+    console.log(method);
+    console.log(from);
+    console.log(args);
     if (args && args.length > 0) {
       return this.contract.methods[method](...args).call({ from });
     }
