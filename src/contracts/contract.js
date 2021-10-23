@@ -100,9 +100,6 @@ class Contract extends Base {
   }
 
   _callMethod(method, from, args) {
-    console.log(method);
-    console.log(from);
-    console.log(args);
     if (args && args.length > 0) {
       return this.contract.methods[method](...args).call({ from });
     }
