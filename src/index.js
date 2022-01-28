@@ -3,7 +3,7 @@ import 'idempotent-babel-polyfill';
 import Web3 from 'web3';
 import Contracts from './contracts';
 import { Http } from './utils';
-import ABI from './ABI';
+import blockscanABI from './blockscanABI';
 import Base from './base';
 import ENSManager from './ens';
 import IPFSStorageManager from './ipfs';
@@ -106,7 +106,7 @@ class Block3 extends Base {
           if (!this.apiKey) {
             return reject(new Error('apiKey or contract.abi must be set in order to load the contract.'));
           }
-          contract.abi = await ABI(contract.address, this.apiKey, contract.network, this.xhr);
+          contract.abi = await blockscanABI(contract.address, this.apiKey, contract.network, this.xhr);
         }
         if (!gasLimit) gasLimit = await this.gasLimit();
         const newContract = new this.web3.eth.Contract(contract.abi, contract.address, { gasLimit });
@@ -117,6 +117,7 @@ class Block3 extends Base {
           events,
           miscellaneous
         } = this._parseABI(contract);
+
         contract._setMethods(methods);
         contract.events = events;
         contract.miscellaneous = miscellaneous;

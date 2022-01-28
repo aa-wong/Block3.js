@@ -1,5 +1,4 @@
 import Base from '../base';
-import ABI from '../ABI';
 import Web3 from 'web3';
 
 class Contract extends Base {
@@ -9,6 +8,14 @@ class Contract extends Base {
 
   set address(a) {
     this.set('address', a, String);
+  }
+
+  get user() {
+    return this.get('user');
+  }
+
+  set user(u) {
+    this.set('user', u, String);
   }
 
   get network() {
@@ -78,6 +85,12 @@ class Contract extends Base {
     if (constant) {
       return this._callMethod(name, from, args);
     }
+    const valIndex = inputs.indexOf('value');
+
+    if (valIndex > -1) {
+      value = args[valIndex];
+      args.splice(valIndex, 1);
+    }
 
     if (payable && !value) {
       return Promise.reject(new Error('Payable methods requires value parameter to be provided.'));
@@ -94,6 +107,13 @@ class Contract extends Base {
 
   _setMethods(m) {
     this.methods = m.reduce((a, c) => {
+      if (c.payable) {
+        c.inputs.push({
+          internalType: "value",
+          name: "value",
+          type: "uint256"
+        });
+      }
       a[c.name] = c;
       return a;
     }, {});

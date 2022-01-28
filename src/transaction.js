@@ -23,6 +23,14 @@ class TransactionManager {
       return Promise.reject(e);
     }
   }
+
+  convertToWei(amount, token) {
+    return this.web3.utils.toWei(amount, token);
+  }
+
+  async sendTransaction(from, to, value) {
+    return this.web3.eth.sendTransaction({from, to, value});
+  }
 }
 
 

@@ -7,18 +7,27 @@ export default (address, apiKey, network, xhr) => {
 
     if (xhr) http.xhr = xhr;
     if (network && network !== 'mainnet') chain += `-${network}`;
+    let host;
+
     http.host = `https://${chain}.etherscan.io`;
 
     try {
-      const res = await http.get('/api', {}, {
+      const {
+        status,
+        result
+      } = await http.get('/api', {}, {
         module: 'contract',
         action: 'getabi',
         address,
         apiKey
       });
 
-      const abi = await JSON.parse(res.result);
-      return resolve(abi);
+      if (parseInt(status)) {
+        const abi = await JSON.parse(result);
+
+        return resolve(abi);
+      }
+      return reject(new Error(result));
     } catch (e) {
       return reject(e);
     }
