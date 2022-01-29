@@ -9,15 +9,16 @@ class Base {
   }
 
   set(prop, value, constructor) {
-    const constructorValidator = (value) => {
-      if (constructor) {
-        return value.constructor === constructor
-      }
-      return true;
-    }
-    if (value && constructorValidator(value)) {
+    if (value && constructorValidator(value, constructor)) {
       this._[prop] = value;
     }
+  }
+
+  constructorValidator(value, constructor) {
+    if (constructor) {
+      return value.constructor === constructor
+    }
+    return true;
   }
 
   update(data = {}) {
@@ -25,8 +26,12 @@ class Base {
     return this;
   }
 
-  export() {
-    return JSON.parse(JSON.stringify(this._));
+  get export() {
+    return this._;
+  }
+
+  exportJson() {
+    return JSON.parse(JSON.stringify(this.export));
   }
 }
 

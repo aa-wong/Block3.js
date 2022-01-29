@@ -1,83 +1,44 @@
 import Contract from './contract';
 
 class ERC20 extends Contract {
-  burn(tokenId) {
-    if (!this.owner) {
-      return Promise.reject(new Error("Owner is required"));
-    }
-    return this.contract
-      .methods
-      .burn(tokenId)
-      .send({ from: this.owner });
-  }
-
-  mint(address) {
-    if (!this.owner) {
-      return Promise.reject(new Error("Owner is required"));
-    }
-    return this.contract
-      .methods
-      .mint(address)
-      .send({ from: this.owner });
-  }
-
-  transferFrom(from, to, id) {
-    return this.contract
-      .methods
-      .transferFrom(from, to, id)
-      .send({ from: from });
-  }
-
-  transferTo(to, id) {
-    if (!this.owner) {
-      return Promise.reject(new Error("Owner is required"));
-    }
-    return this.transferFrom(this.owner, to, id);
-  }
-
-  transferOwnership(to) {
-    if (!this.owner) {
-      return Promise.reject(new Error("Owner is required"));
-    }
-    return this.contract
-      .methods
-      .transferOwnership(to)
-      .send({ from: this.owner });
-  }
-
-  totalSupply() {
-    return this.contract
-      .methods
-      .totalSupply()
-      .call();
-  }
-
-  ownerOf(id) {
-    return this.contract
-      .methods
-      .ownerOf(id)
-      .call();
-  }
-
-  balanceOf(address) {
-    return this.contract
-      .methods
-      .balanceOf(address)
-      .call();
-  }
-
   name() {
-    return this.contract
-      .methods
-      .name()
-      .call();
+    return this.contract.execute('name');
   }
 
   symbol() {
-    return this.contract
-      .methods
-      .symbol()
-      .call();
+    return this.contract.execute('symbol');
+  }
+
+  burn(tokenId) {
+    return this.contract.execute('burn', [tokenId]);
+  }
+
+  mint(address) {
+    return this.contract.execute('mint', [address]);
+  }
+
+  transferFrom(from, to, id) {
+    return this.contract.execute('transferFrom', [from, to, id]);
+  }
+
+  transferTo(to, id) {
+    return this.contract.execute('transferTo', [to, id]);
+  }
+
+  transferOwnership(to) {
+    return this.contract.execute('transferOwnership', [to]);
+  }
+
+  totalSupply() {
+    return this.contract.execute('totalSupply');
+  }
+
+  ownerOf(id) {
+    return this.contract.execute('ownerOf', [id]);
+  }
+
+  balanceOf(address) {
+    return this.contract.execute('balanceOf', [address]);
   }
 }
 

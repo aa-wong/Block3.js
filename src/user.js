@@ -1,26 +1,27 @@
-class User {
-  /**
-   * Constructor Method
-   * @param {Object} options options to apply on initialization
-   */
-  constructor(ethereum) {
-    this.ethereum = ethereum;
+import Provider from './provider';
+import Account from './account';
+
+class User extends Provider {
+  get signer() {
+    return this.provider.getSigner();
   }
 
-  /**
-   * PROPERTIES
-   */
+  async account() {
+    try {
+      const address = await this.signer.getAddress();
+
+      return Promise.resolve(new Account({ ...this.export, address }));
+    } catch(e) {
+      return Promise.reject(e);
+    }
+  }
+
   accounts() {
-    return this.ethereum.request({ method: 'eth_requestAccounts' });
+    return this.provider.listAccounts().map(a => new Account({ ...this.export, a }));
   }
 
-  /**
-   * [onRequest description]
-   * @param  {Function} cb [description]
-   * @return {[type]}      [description]
-   */
-  onAccountSwitch(cb) {
-    return this.ethereum.on('accountsChanged', cb);
+  onAccountChange(cb) {
+    return this.provider.on('accountsChanged', a => cb(new Account({ ...this.export, a })));
   }
 }
 

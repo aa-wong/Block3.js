@@ -1,76 +1,84 @@
-import Base from '../base';
-import Web3 from 'web3';
+import Account from '../account';
+import User from '../user';
 
-class Contract extends Base {
-  get address() {
-    return this.get('address');
-  }
-
-  set address(a) {
-    this.set('address', a, String);
-  }
-
-  get user() {
-    return this.get('user');
-  }
-
-  set user(u) {
-    this.set('user', u, String);
-  }
-
-  get network() {
-    return this.get('network');
-  }
-
-  set network(n) {
-    this.set('network', n, String);
-  }
-
+class Contract extends Account {
   get abi() {
-    return this.get('abi');
+    this.get('abi');
   }
 
   set abi(abi) {
+    this.methods = undefined;
+    this.events = undefined;
+    this.miscellaneous = undefined;
+
+    const methods = [];
+    const events = [];
+    const miscellaneous = [];
+
+    for (let m of abi) {
+      if (!m.type) miscellaneous.push(m);
+      if (m.type === 'function') methods.push(m);
+      else if (m.type === 'event') events.push(m);
+    }
+
+    this.methods = methods;
+    this.events = events;
+    this.miscellaneous = miscellaneous;
+
     this.set('abi', abi, Array);
   }
 
-  get contract() {
-    return this.get('contract');
+  get user() {
+    this.get('user');
   }
 
-  set contract(c) {
-    this.set('contract', c);
+  set user(user) {
+    this.set('user', user, User);
+  }
+
+  get contract() {
+    if (this._contract) {
+      return this._contract;
+    }
+    this._contract = new ethers.Contract(this.address, this.abi, this.provider);
+
+    return this._contract;
   }
 
   get methods() {
-    return this.get('methods', {});
+    return this._methods;
   }
 
   set methods(m) {
-    this.set('methods', m, Object);
+    if (m && constructorValidator(m, Object)) {
+      this._methods = m;
+    }
   }
 
   get events() {
-    return this.get('events', []);
+    return this._events;
   }
 
-  set events(m) {
-    this.set('events', m, Array);
+  set events(e) {
+    if (e && constructorValidator(e, Array)) {
+      this._events = e;
+    }
   }
 
   get miscellaneous() {
-    return this.get('miscellaneous', []);
+    return this._miscellaneous;
   }
 
   set miscellaneous(m) {
-    this.set('miscellaneous', m, Array);
+    if (m && constructorValidator(e, Array)) {
+      this._miscellaneous = m;
+    }
   }
 
-  async execute(method, from, args, value) {
+  async execute(method, args, params = {}) {
     if (!method || !from) {
-      return Promise.reject(new Error('method and from parameters are required.'));
+      return Promise.reject(new Error('method parameter is required.'));
     }
-
     const {
       constant,
       inputs,
@@ -82,55 +90,19 @@ class Contract extends Base {
       return Promise.reject(new Error('Invalid number of arguments provided.'));
     }
 
-    if (constant) {
-      return this._callMethod(name, from, args);
-    }
-    const valIndex = inputs.indexOf('value');
-
-    if (valIndex > -1) {
-      value = args[valIndex];
-      args.splice(valIndex, 1);
-    }
-
-    if (payable && !value) {
+    if (payable && !params.value) {
       return Promise.reject(new Error('Payable methods requires value parameter to be provided.'));
     }
 
-    return this._sendMethod(name, from, args, value);
+    if (!this.user || constant) {
+      return this.contract[method](...args, params);
+    }
+    return this.contract.connect(this.user.signer)[method](...args, params);
   }
 
   export() {
-    this._['contract'] = undefined;
-    this._['methods'] = undefined;
+    delete this._['user'];
     return super.export();
-  }
-
-  _setMethods(m) {
-    this.methods = m.reduce((a, c) => {
-      if (c.payable) {
-        c.inputs.push({
-          internalType: "value",
-          name: "value",
-          type: "uint256"
-        });
-      }
-      a[c.name] = c;
-      return a;
-    }, {});
-  }
-
-  _callMethod(method, from, args) {
-    if (args && args.length > 0) {
-      return this.contract.methods[method](...args).call({ from });
-    }
-    return this.contract.methods[method]().call({ from });
-  }
-
-  _sendMethod(method, from, args, value) {
-    if (args && args.length > 0) {
-      return this.contract.methods[method](...args).send({ from, value });
-    }
-    return this.contract.methods[method]().send({ from, value });
   }
 }
 

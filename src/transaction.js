@@ -1,8 +1,7 @@
-class TransactionManager {
-  constructor(web3) {
-    this.web3 = web3;
-  }
+import Provider from './provider';
+import Account from './account';
 
+class Transaction extends Provider {
   getTransactionByHash(txHash) {
     return this.web3.eth.getTransaction(txHash);
   }
