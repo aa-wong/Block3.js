@@ -112,6 +112,10 @@ class Block3 extends Base {
     }
   }
 
+  clearContracts() {
+    delete this._['contracts'];
+  }
+
   export() {
     if (this.contracts) this._['contracts'] = this.contracts.export();
     return super.export();

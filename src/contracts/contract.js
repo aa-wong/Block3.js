@@ -143,6 +143,7 @@ class Contract extends Account {
 
   export() {
     delete this._['user'];
+    delete this._['provider'];
     if (this.network) this._['network'] = this.network.export();
     return super.export();
   }

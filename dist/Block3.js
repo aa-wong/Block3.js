@@ -83063,6 +83063,7 @@ class Contract extends _account__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   export() {
     delete this._['user'];
+    delete this._['provider'];
     if (this.network) this._['network'] = this.network.export();
     return super.export();
   }
@@ -83500,6 +83501,10 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_3__["default"] {
     } catch (e) {
       return Promise.reject(e);
     }
+  }
+
+  clearContracts() {
+    delete this._['contracts'];
   }
 
   export() {
