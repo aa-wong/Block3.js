@@ -33,4 +33,4 @@ class Transaction extends Provider {
 }
 
 
-export default TransactionManager;
+export default Transaction;

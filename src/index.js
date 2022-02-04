@@ -1,21 +1,22 @@
 import 'babel-register';
 import 'idempotent-babel-polyfill';
-import ethers from "ethers";
+import { ethers } from 'ethers';
+import Base from './base';
 import Contracts from './contracts';
 import blockscanABI from './blockscanABI';
 import Transaction from './transaction';
 import Block from './block';
 import ENS from './ens';
-import Network from './network';
+import Networks from './networks';
 import User from './user';
 
-class Block3 {
-  constructor() {
-    this._contracts = {};
-  }
-
+class Block3 extends Base {
   static get ethers() {
     return ethers;
+  }
+
+  static get utils() {
+    return this.ethers.utils;
   }
 
   static get Contracts() {
@@ -26,28 +27,34 @@ class Block3 {
     return ethers.providers;
   }
 
-  get apiKey() {
-    return this.get('apiKey');
+  static get isWeb3Supported() {
+    const { ethereum } = window;
+
+    return !!ethereum;
   }
 
-  set apiKey(apiKey) {
-    this.set('apiKey', apiKey, String);
+  get scanApiKey() {
+    return this.get('scan_api_key');
+  }
+
+  set scanApiKey(apiKey) {
+    this.set('scan_api_key', apiKey, String);
   }
 
   get provider() {
-    return this._provider;
+    return this.get('provider');
   }
 
   set provider(p) {
-    this._provider = p;
+    this.set('provider', p);
   }
 
   get contracts() {
-    return this._contracts;
+    return this.get('contracts', {});
   }
 
   set contracts(c) {
-    this._contracts = c;
+    this.set('contracts', c, Object);
   }
 
   get block() {
@@ -62,16 +69,12 @@ class Block3 {
     return new Transaction({ provider: this.provider });
   }
 
-  get network() {
-    return new Network({ provider: this.provider });
+  get networks() {
+    return new Networks({ provider: this.provider });
   }
 
   get ens() {
     return new ENS({ provider: this.provider });
-  }
-
-  get network() {
-    return new Network({ provider: this.provider });
   }
 
   get xhr() {
@@ -82,35 +85,36 @@ class Block3 {
     this.set('xhr', c, XMLHttpRequest);
   }
 
-  get isWeb3Supported() {
-    const { ethereum } = window;
-
-    return !!ethereum;
-  }
-
-  getContract(address) {
-    return this.contracts[address];
+  getContract(network, address) {
+    return this.contracts[network.chainId][address];
   }
 
   async loadContract(contract) {
-    if (!contract.network || !contract.address) {
-      return Promise.reject(new Error('contract network, contract address must be set in order to load the contract.'));
+    if (contract.address) {
+      return Promise.reject(new Error('Contract address must be set in order to load the contract.'));
     }
 
     try {
+      if (!contract.network) contract.network = await this.networks.current();
       if (!contract.abi) {
-        if (!this.apiKey) {
-          return Promise.reject(new Error('apiKey or contract.abi must be set in order to load the contract.'));
+        if (!this.scanApiKey) {
+          return Promise.reject(new Error('scanApiKey or contract.abi must be set in order to load the contract.'));
         }
-        contract.abi = await blockscanABI(contract.address, this.apiKey, contract.network, this.xhr);
+        contract.abi = await blockscanABI(contract.address, this.scanApiKey, contract.network.name, this.xhr);
       }
       contract.provider = this.provider;
       contract.user = this.user;
-      this.contracts[contract.address] = contract;
+      if (!this.contracts[network.chainId]) this.contracts[network.chainId] = {};
+      this.contracts[network.chainId][contract.address] = contract;
       return Promise.resolve(contract);
     } catch (e) {
       return Promise.reject(e);
     }
+  }
+
+  export() {
+    if (this.contracts) this._['contracts'] = this.contracts.export();
+    return super.export();
   }
 }
 

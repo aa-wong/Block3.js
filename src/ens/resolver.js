@@ -79,4 +79,4 @@ class ENSResolver extends Provider {
   }
 }
 
-export default ENS;
+export default ENSResolver;

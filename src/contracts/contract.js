@@ -1,31 +1,41 @@
 import Account from '../account';
 import User from '../user';
+import Network from '../networks/network';
 
 class Contract extends Account {
+  constructor(data = {}) {
+    super(data);
+    if (data.network) this.network = new Network(data.network);
+    if (data.abi) this.abi = data.abi;
+    this._callbacks = {};
+  }
+
   get abi() {
     this.get('abi');
   }
 
   set abi(abi) {
-    this.methods = undefined;
-    this.events = undefined;
-    this.miscellaneous = undefined;
+    if (Array.isArray(abi)) {
+      this.functions = undefined;
+      this.events = undefined;
+      this.miscellaneous = undefined;
 
-    const methods = [];
-    const events = [];
-    const miscellaneous = [];
+      const functions = [];
+      const events = [];
+      const miscellaneous = [];
 
-    for (let m of abi) {
-      if (!m.type) miscellaneous.push(m);
-      if (m.type === 'function') methods.push(m);
-      else if (m.type === 'event') events.push(m);
+      for (let m of abi) {
+        if (!m.type) miscellaneous.push(m);
+        if (m.type === 'function') functions.push(m);
+        else if (m.type === 'event') events.push(m);
+      }
+
+      this.functions = functions;
+      this.events = events;
+      this.miscellaneous = miscellaneous;
+
+      this.set('abi', abi, Array);
     }
-
-    this.methods = methods;
-    this.events = events;
-    this.miscellaneous = miscellaneous;
-
-    this.set('abi', abi, Array);
   }
 
   get user() {
@@ -34,6 +44,14 @@ class Contract extends Account {
 
   set user(user) {
     this.set('user', user, User);
+  }
+
+  get network() {
+    this.get('network');
+  }
+
+  set network(network) {
+    this.set('network', network, Network);
   }
 
   get contract() {
@@ -45,13 +63,13 @@ class Contract extends Account {
     return this._contract;
   }
 
-  get methods() {
-    return this._methods;
+  get functions() {
+    return this._functions;
   }
 
-  set methods(m) {
-    if (m && constructorValidator(m, Object)) {
-      this._methods = m;
+  set functions(m) {
+    if (m && constructorValidator(m, Array)) {
+      this._functions = m;
     }
   }
 
@@ -75,16 +93,22 @@ class Contract extends Account {
     }
   }
 
-  async execute(method, args, params = {}) {
-    if (!method || !from) {
-      return Promise.reject(new Error('method parameter is required.'));
+  execute(abi, args=[], params = {}) {
+    if (!abi) {
+      return Promise.reject(new Error('abi parameter is required.'));
     }
     const {
+      type,
       constant,
       inputs,
       name,
       payable,
-    } = method;
+      outputs
+    } = abi;
+
+    if (type === 'function') {
+      return Promise.reject(new Error('Invalid ABI. Should be of type `function`'));
+    }
 
     if (inputs.length > 0 && args.length !== inputs.length) {
       return Promise.reject(new Error('Invalid number of arguments provided.'));
@@ -95,13 +119,31 @@ class Contract extends Account {
     }
 
     if (!this.user || constant) {
-      return this.contract[method](...args, params);
+      return this.contract[name](...args, params);
     }
-    return this.contract.connect(this.user.signer)[method](...args, params);
+    return this.contract.connect(this.user.signer)[name](...args, params);
+  }
+
+  event(abi, cb) {
+    if (!abi || !cb || typeof cb !== 'function') {
+      return Promise.reject(new Error('abi and valid callback function is required.'));
+    }
+    const {
+      name,
+      type
+    } = abi;
+
+    if (type !== 'event') {
+      return Promise.reject(new Error('Invalid ABI. Should be of type `event`'));
+    }
+
+    this._callbacks[name] = this.contract.on(name, cb);
+    return Promise.resolve(this);
   }
 
   export() {
     delete this._['user'];
+    if (this.network) this._['network'] = this.network.export();
     return super.export();
   }
 }

@@ -9,12 +9,12 @@ class ERC20 extends Contract {
     return this.contract.execute('symbol');
   }
 
-  burn(tokenId) {
-    return this.contract.execute('burn', [tokenId]);
+  burn(tokenId, params = {}) {
+    return this.contract.execute('burn', [tokenId], params);
   }
 
-  mint(address) {
-    return this.contract.execute('mint', [address]);
+  mint(address, params = {}) {
+    return this.contract.execute('mint', [address], params);
   }
 
   transferFrom(from, to, id) {

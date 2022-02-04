@@ -1,8 +1,15 @@
-import Provider from './provider';
+import Provider from '../provider';
+import Network from './network';
 
-class Network extends Provider {
-  current() {
-    return this.provider.getNetwork();
+class Networks extends Provider {
+  async current() {
+    try {
+      const n = await this.provider.getNetwork();
+
+      return Promise.resolve(new Network(n));
+    } catch (e) {
+      return Promise.reject(e);
+    }
   }
 
   feeData() {
@@ -43,10 +50,11 @@ class Network extends Provider {
 
   onChange(cb) {
     return this.provider.on('network', (newNetwork, oldNetwork) => {
-      if (oldNetwork && window) window.location.reload();
-      return cb(newNetwork);
+      if (oldNetwork) {
+        return cb(new Network(newNetwork), new Network(oldNetwork));
+      }
     });
   }
 }
 
-export default Network;
+export default Networks;
