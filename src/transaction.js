@@ -6,7 +6,6 @@ const {
   utils
 } = ethers;
 
-
 class Transaction extends Provider {
   // getTransactionByHash(txHash) {
   //   return this.web3.eth.getTransaction(txHash);
