@@ -89,27 +89,24 @@ class Block3 extends Base {
     return this.contracts[network.chainId][address];
   }
 
-  async loadContract(contract) {
-    if (contract.address) {
-      return Promise.reject(new Error('Contract address must be set in order to load the contract.'));
+  async loadAbi(address, network) {
+    if (!this.scanApiKey) {
+      return Promise.reject(new Error('scanApiKey or contract.abi must be set in order to load the contract.'));
     }
+    return await blockscanABI(contract.address, this.scanApiKey, contract.network.name, this.xhr);
+  }
 
-    try {
-      if (!contract.network) contract.network = await this.networks.current();
-      if (!contract.abi) {
-        if (!this.scanApiKey) {
-          return Promise.reject(new Error('scanApiKey or contract.abi must be set in order to load the contract.'));
-        }
-        contract.abi = await blockscanABI(contract.address, this.scanApiKey, contract.network.name, this.xhr);
-      }
-      contract.provider = this.provider;
-      contract.user = this.user;
-      if (!this.contracts[network.chainId]) this.contracts[network.chainId] = {};
-      this.contracts[network.chainId][contract.address] = contract;
-      return Promise.resolve(contract);
-    } catch (e) {
-      return Promise.reject(e);
+  saveContract(contract) {
+    const network = contract.network;
+
+    if (!this.contracts[network.chainId]) {
+      const cs = this.contracts;
+
+      cs[network.chainId] = {};
+      this.contracts = cs;
     }
+    this.contracts[network.chainId][contract.address] = contract;
+    return contract;
   }
 
   clearContracts() {

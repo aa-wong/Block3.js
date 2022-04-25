@@ -6,13 +6,13 @@ class Base {
   }
 
   get(prop, _default) {
-    return this._[prop] !== null ? this._[prop] : _default;
+    const o = this._[prop];
+
+    return o !== undefined ? o : _default;
   }
 
   set(prop, value, constructor) {
-    if (value && constructorValidator(value, constructor)) {
-      this._[prop] = value;
-    }
+    if (value && this.constructorValidator(value, constructor)) this._[prop] = value;
   }
 
   constructorValidator(value, constructor) {

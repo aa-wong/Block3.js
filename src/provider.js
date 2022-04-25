@@ -5,9 +5,13 @@ class Provider extends Base {
     return this.get('provider');
   }
 
+  set provider(p) {
+    this.set('provider', p);
+  }
+
   export() {
     if (this.provider) this._['provider'] = undefined;
-    return super.export();
+    return this.export();
   }
 }
 

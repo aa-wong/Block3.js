@@ -1,99 +1,149 @@
-import Account from '../account';
+import { ethers } from 'ethers';
+import Base from '../base';
 import User from '../user';
 import Network from '../networks/network';
 
-class Contract extends Account {
+class Contract extends Base {
   constructor(data = {}) {
     super(data);
-    if (data.network) this.network = new Network(data.network);
-    if (data.abi) this.abi = data.abi;
-    this._callbacks = {};
+    this.address = data.address;
+    this.network = data.network;
+    this._currentNetwork = this.network
+    this.abi = data.abi;
+    if (data.user && this.constructorValidator(data.user, User)) this.user = data.user;
+
+    if (!this.address || !this.network || !this.abi || !this.user) {
+      throw new Error('Valid address, users, abi and network is required to create contract instance');
+    }
+    this.resetCallbacks();
+  }
+
+  get address() {
+    return this.get('address');
+  }
+
+  set address(a) {
+    this.set('address', a, String);
   }
 
   get abi() {
-    this.get('abi');
+    return this.get('abi');
   }
 
-  set abi(abi) {
-    if (Array.isArray(abi)) {
-      this.functions = undefined;
-      this.events = undefined;
-      this.miscellaneous = undefined;
+  set abi(a) {
+    if (Array.isArray(a)) {
+      const p = [];
+      const n = [];
+      const v = [];
+      const e = [];
+      const m = [];
 
-      const functions = [];
-      const events = [];
-      const miscellaneous = [];
-
-      for (let m of abi) {
-        if (!m.type) miscellaneous.push(m);
-        if (m.type === 'function') functions.push(m);
-        else if (m.type === 'event') events.push(m);
+      for (let k of a) {
+        if (!k.type) m.push(k);
+        if (k.type === 'function') {
+          if (k.stateMutability === 'view') v.push(k);
+          else if (k.stateMutability === 'payable') p.push(k);
+          else n.push(k);
+        } else if (k.type === 'event') e.push(k);
       }
+      this._payables = p;
+      this._nonpayables = n;
+      this._views = v;
+      this._events = e;
+      this._miscellaneous = m;
 
-      this.functions = functions;
-      this.events = events;
-      this.miscellaneous = miscellaneous;
-
-      this.set('abi', abi, Array);
+      super.set('abi', a);
     }
   }
 
   get user() {
-    this.get('user');
+    return this.get('user');
   }
 
   set user(user) {
     this.set('user', user, User);
+
+    user.provider.on('network', (newNetwork, oldNetwork) => {
+      console.log('Contract network update');
+      if (oldNetwork) {
+        this._currentNetwork = new Network(newNetwork);
+        console.log(this._currentNetwork);
+        if (this._currentNetwork !== this.network) {
+          this.resetCallbacks();
+        }
+      }
+    });
   }
 
   get network() {
-    this.get('network');
+    return this.get('network');
   }
 
   set network(network) {
-    this.set('network', network, Network);
+    super.set('network', network, Network);
   }
 
   get contract() {
     if (this._contract) {
       return this._contract;
     }
-    this._contract = new ethers.Contract(this.address, this.abi, this.provider);
+    this._contract = new ethers.Contract(this.address, this.abi, this.user.provider);
 
     return this._contract;
   }
 
   get functions() {
-    return this._functions;
+    return {
+      payables: this.payables,
+      nonpayables: this.nonpayables,
+      views: this.views
+    }
   }
 
-  set functions(m) {
-    if (m && constructorValidator(m, Array)) {
-      this._functions = m;
-    }
+  get payables() {
+    return this._payables === undefined ? [] : this._payables;
+  }
+
+  get nonpayables() {
+    return this._nonpayables === undefined ? [] : this._nonpayables;
+  }
+
+  get views() {
+    return this._views === undefined ? [] : this._views;
   }
 
   get events() {
-    return this._events;
-  }
-
-  set events(e) {
-    if (e && constructorValidator(e, Array)) {
-      this._events = e;
-    }
+    return this._events === undefined ? [] : this._events;
   }
 
   get miscellaneous() {
-    return this._miscellaneous;
+    return this._miscellaneous === undefined ? [] : this._miscellaneous;
   }
 
-  set miscellaneous(m) {
-    if (m && constructorValidator(e, Array)) {
-      this._miscellaneous = m;
-    }
+  getEnsName() {
+    return this.user.provider.lookupAddress(this.address);
+  }
+
+  balance() {
+    return this.user.provider.getBalance(this.address);
+  }
+
+  code() {
+    return this.user.provider.getCode(this.address);
+  }
+
+  storage() {
+    return this.user.provider.getStorageAt(this.address, 0);
+  }
+
+  transactionCount() {
+    return this.user.provider.getTransactionCount(this.address);
   }
 
   execute(abi, args=[], params = {}) {
+    if (this._currentNetwork.chainId !== this.network.chainId) {
+      return Promise.reject(new Error('Incompatible current network.'));
+    }
     if (!abi) {
       return Promise.reject(new Error('abi parameter is required.'));
     }
@@ -106,7 +156,7 @@ class Contract extends Account {
       outputs
     } = abi;
 
-    if (type === 'function') {
+    if (type !== 'function') {
       return Promise.reject(new Error('Invalid ABI. Should be of type `function`'));
     }
 
@@ -125,6 +175,9 @@ class Contract extends Account {
   }
 
   event(abi, cb) {
+    if (this._currentNetwork.chainId !== this.network.chainId) {
+      return Promise.reject(new Error('Incompatible current network.'));
+    }
     if (!abi || !cb || typeof cb !== 'function') {
       return Promise.reject(new Error('abi and valid callback function is required.'));
     }
@@ -141,9 +194,11 @@ class Contract extends Account {
     return Promise.resolve(this);
   }
 
+  resetCallbacks() {
+    this._callbacks = {};
+  }
+
   export() {
-    delete this._['user'];
-    delete this._['provider'];
     if (this.network) this._['network'] = this.network.export();
     return super.export();
   }

@@ -9,6 +9,10 @@ class Account extends Provider {
     this.set('address', a, String);
   }
 
+  getEnsName() {
+    return this.provider.lookupAddress(this.address);
+  }
+
   balance() {
     return this.provider.getBalance(this.address);
   }

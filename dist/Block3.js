@@ -82725,6 +82725,10 @@ class Account extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
     this.set('address', a, String);
   }
 
+  getEnsName() {
+    return this.provider.lookupAddress(this.address);
+  }
+
   balance() {
     return this.provider.getBalance(this.address);
   }
@@ -82764,13 +82768,12 @@ class Base {
   }
 
   get(prop, _default) {
-    return this._[prop] !== null ? this._[prop] : _default;
+    const o = this._[prop];
+    return o !== undefined ? o : _default;
   }
 
   set(prop, value, constructor) {
-    if (value && constructorValidator(value, constructor)) {
-      this._[prop] = value;
-    }
+    if (value && this.constructorValidator(value, constructor)) this._[prop] = value;
   }
 
   constructorValidator(value, constructor) {
@@ -82915,60 +82918,94 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _account__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../account */ "./src/account.js");
-/* harmony import */ var _user__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../user */ "./src/user.js");
-/* harmony import */ var _networks_network__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../networks/network */ "./src/networks/network.js");
+/* harmony import */ var ethers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../base */ "./src/base.js");
+/* harmony import */ var _user__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../user */ "./src/user.js");
+/* harmony import */ var _networks_network__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../networks/network */ "./src/networks/network.js");
 
 
 
 
-class Contract extends _account__WEBPACK_IMPORTED_MODULE_0__["default"] {
+
+class Contract extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
   constructor(data = {}) {
     super(data);
-    if (data.network) this.network = new _networks_network__WEBPACK_IMPORTED_MODULE_2__["default"](data.network);
-    if (data.abi) this.abi = data.abi;
-    this._callbacks = {};
+    this.address = data.address;
+    this.network = data.network;
+    this._currentNetwork = this.network;
+    this.abi = data.abi;
+    if (data.user && this.constructorValidator(data.user, _user__WEBPACK_IMPORTED_MODULE_2__["default"])) this.user = data.user;
+
+    if (!this.address || !this.network || !this.abi || !this.user) {
+      throw new Error('Valid address, users, abi and network is required to create contract instance');
+    }
+
+    this.resetCallbacks();
+  }
+
+  get address() {
+    return this.get('address');
+  }
+
+  set address(a) {
+    this.set('address', a, String);
   }
 
   get abi() {
-    this.get('abi');
+    return this.get('abi');
   }
 
-  set abi(abi) {
-    if (Array.isArray(abi)) {
-      this.functions = undefined;
-      this.events = undefined;
-      this.miscellaneous = undefined;
-      const functions = [];
-      const events = [];
-      const miscellaneous = [];
+  set abi(a) {
+    if (Array.isArray(a)) {
+      const p = [];
+      const n = [];
+      const v = [];
+      const e = [];
+      const m = [];
 
-      for (let m of abi) {
-        if (!m.type) miscellaneous.push(m);
-        if (m.type === 'function') functions.push(m);else if (m.type === 'event') events.push(m);
+      for (let k of a) {
+        if (!k.type) m.push(k);
+
+        if (k.type === 'function') {
+          if (k.stateMutability === 'view') v.push(k);else if (k.stateMutability === 'payable') p.push(k);else n.push(k);
+        } else if (k.type === 'event') e.push(k);
       }
 
-      this.functions = functions;
-      this.events = events;
-      this.miscellaneous = miscellaneous;
-      this.set('abi', abi, Array);
+      this._payables = p;
+      this._nonpayables = n;
+      this._views = v;
+      this._events = e;
+      this._miscellaneous = m;
+      super.set('abi', a);
     }
   }
 
   get user() {
-    this.get('user');
+    return this.get('user');
   }
 
   set user(user) {
-    this.set('user', user, _user__WEBPACK_IMPORTED_MODULE_1__["default"]);
+    this.set('user', user, _user__WEBPACK_IMPORTED_MODULE_2__["default"]);
+    user.provider.on('network', (newNetwork, oldNetwork) => {
+      console.log('Contract network update');
+
+      if (oldNetwork) {
+        this._currentNetwork = new _networks_network__WEBPACK_IMPORTED_MODULE_3__["default"](newNetwork);
+        console.log(this._currentNetwork);
+
+        if (this._currentNetwork !== this.network) {
+          this.resetCallbacks();
+        }
+      }
+    });
   }
 
   get network() {
-    this.get('network');
+    return this.get('network');
   }
 
   set network(network) {
-    this.set('network', network, _networks_network__WEBPACK_IMPORTED_MODULE_2__["default"]);
+    super.set('network', network, _networks_network__WEBPACK_IMPORTED_MODULE_3__["default"]);
   }
 
   get contract() {
@@ -82976,41 +83013,63 @@ class Contract extends _account__WEBPACK_IMPORTED_MODULE_0__["default"] {
       return this._contract;
     }
 
-    this._contract = new ethers.Contract(this.address, this.abi, this.provider);
+    this._contract = new ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"].Contract(this.address, this.abi, this.user.provider);
     return this._contract;
   }
 
   get functions() {
-    return this._functions;
+    return {
+      payables: this.payables,
+      nonpayables: this.nonpayables,
+      views: this.views
+    };
   }
 
-  set functions(m) {
-    if (m && constructorValidator(m, Array)) {
-      this._functions = m;
-    }
+  get payables() {
+    return this._payables === undefined ? [] : this._payables;
+  }
+
+  get nonpayables() {
+    return this._nonpayables === undefined ? [] : this._nonpayables;
+  }
+
+  get views() {
+    return this._views === undefined ? [] : this._views;
   }
 
   get events() {
-    return this._events;
-  }
-
-  set events(e) {
-    if (e && constructorValidator(e, Array)) {
-      this._events = e;
-    }
+    return this._events === undefined ? [] : this._events;
   }
 
   get miscellaneous() {
-    return this._miscellaneous;
+    return this._miscellaneous === undefined ? [] : this._miscellaneous;
   }
 
-  set miscellaneous(m) {
-    if (m && constructorValidator(e, Array)) {
-      this._miscellaneous = m;
-    }
+  getEnsName() {
+    return this.user.provider.lookupAddress(this.address);
+  }
+
+  balance() {
+    return this.user.provider.getBalance(this.address);
+  }
+
+  code() {
+    return this.user.provider.getCode(this.address);
+  }
+
+  storage() {
+    return this.user.provider.getStorageAt(this.address, 0);
+  }
+
+  transactionCount() {
+    return this.user.provider.getTransactionCount(this.address);
   }
 
   execute(abi, args = [], params = {}) {
+    if (this._currentNetwork.chainId !== this.network.chainId) {
+      return Promise.reject(new Error('Incompatible current network.'));
+    }
+
     if (!abi) {
       return Promise.reject(new Error('abi parameter is required.'));
     }
@@ -83024,7 +83083,7 @@ class Contract extends _account__WEBPACK_IMPORTED_MODULE_0__["default"] {
       outputs
     } = abi;
 
-    if (type === 'function') {
+    if (type !== 'function') {
       return Promise.reject(new Error('Invalid ABI. Should be of type `function`'));
     }
 
@@ -83044,6 +83103,10 @@ class Contract extends _account__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   event(abi, cb) {
+    if (this._currentNetwork.chainId !== this.network.chainId) {
+      return Promise.reject(new Error('Incompatible current network.'));
+    }
+
     if (!abi || !cb || typeof cb !== 'function') {
       return Promise.reject(new Error('abi and valid callback function is required.'));
     }
@@ -83061,9 +83124,11 @@ class Contract extends _account__WEBPACK_IMPORTED_MODULE_0__["default"] {
     return Promise.resolve(this);
   }
 
+  resetCallbacks() {
+    this._callbacks = {};
+  }
+
   export() {
-    delete this._['user'];
-    delete this._['provider'];
     if (this.network) this._['network'] = this.network.export();
     return super.export();
   }
@@ -83477,30 +83542,25 @@ class Block3 extends _base__WEBPACK_IMPORTED_MODULE_3__["default"] {
     return this.contracts[network.chainId][address];
   }
 
-  async loadContract(contract) {
-    if (contract.address) {
-      return Promise.reject(new Error('Contract address must be set in order to load the contract.'));
+  async loadAbi(address, network) {
+    if (!this.scanApiKey) {
+      return Promise.reject(new Error('scanApiKey or contract.abi must be set in order to load the contract.'));
     }
 
-    try {
-      if (!contract.network) contract.network = await this.networks.current();
+    return await Object(_blockscanABI__WEBPACK_IMPORTED_MODULE_5__["default"])(contract.address, this.scanApiKey, contract.network.name, this.xhr);
+  }
 
-      if (!contract.abi) {
-        if (!this.scanApiKey) {
-          return Promise.reject(new Error('scanApiKey or contract.abi must be set in order to load the contract.'));
-        }
+  saveContract(contract) {
+    const network = contract.network;
 
-        contract.abi = await Object(_blockscanABI__WEBPACK_IMPORTED_MODULE_5__["default"])(contract.address, this.scanApiKey, contract.network.name, this.xhr);
-      }
-
-      contract.provider = this.provider;
-      contract.user = this.user;
-      if (!this.contracts[network.chainId]) this.contracts[network.chainId] = {};
-      this.contracts[network.chainId][contract.address] = contract;
-      return Promise.resolve(contract);
-    } catch (e) {
-      return Promise.reject(e);
+    if (!this.contracts[network.chainId]) {
+      const cs = this.contracts;
+      cs[network.chainId] = {};
+      this.contracts = cs;
     }
+
+    this.contracts[network.chainId][contract.address] = contract;
+    return contract;
   }
 
   clearContracts() {
@@ -83647,9 +83707,13 @@ class Provider extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     return this.get('provider');
   }
 
+  set provider(p) {
+    this.set('provider', p);
+  }
+
   export() {
     if (this.provider) this._['provider'] = undefined;
-    return super.export();
+    return this.export();
   }
 
 }
@@ -83667,42 +83731,61 @@ class Provider extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./provider */ "./src/provider.js");
-/* harmony import */ var _account__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./account */ "./src/account.js");
+/* harmony import */ var ethers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./provider */ "./src/provider.js");
+/* harmony import */ var _user__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./user */ "./src/user.js");
 
 
 
-class Transaction extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  getTransactionByHash(txHash) {
-    return this.web3.eth.getTransaction(txHash);
+const {
+  BigNumber,
+  utils
+} = ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"];
+
+class Transaction extends _provider__WEBPACK_IMPORTED_MODULE_1__["default"] {
+  // getTransactionByHash(txHash) {
+  //   return this.web3.eth.getTransaction(txHash);
+  // }
+  //
+  // async getTransactionResponse(tx) {
+  //   try {
+  //     let result = await this.web3.eth.call(tx, tx.blockNumber);
+  //
+  //     result = result.startsWith('0x') ? result : `0x${result}`;
+  //     if (result && result.substr(138)) {
+  //       const reason = this.web3.utils.toAscii(result.substr(138));
+  //
+  //       return Promise.resolve(reason);
+  //     } else {
+  //       return Promise.resolve('Transaction message not found - No return value');
+  //     }
+  //   } catch (e) {
+  //     return Promise.reject(e);
+  //   }
+  // }
+  toBigNumber(amount) {
+    return BigNumber.from(amount);
   }
 
-  async getTransactionResponse(tx) {
-    try {
-      let result = await this.web3.eth.call(tx, tx.blockNumber);
-      result = result.startsWith('0x') ? result : `0x${result}`;
-
-      if (result && result.substr(138)) {
-        const reason = this.web3.utils.toAscii(result.substr(138));
-        return Promise.resolve(reason);
-      } else {
-        return Promise.resolve('Transaction message not found - No return value');
-      }
-    } catch (e) {
-      return Promise.reject(e);
-    }
+  formatEther(amount) {
+    return utils.formatEther(amount);
   }
 
-  convertToWei(amount, token) {
-    return this.web3.utils.toWei(amount, token);
+  parseEther(amount) {
+    return utils.parseEther(amount);
   }
 
-  async sendTransaction(from, to, value) {
-    return this.web3.eth.sendTransaction({
+  parseUnits(amount, units) {
+    return utils.parseUnits(amount, units);
+  }
+
+  sendTransaction(from, to, value) {
+    const params = [{
       from,
       to,
-      value
-    });
+      value: utils.parseUnits(value, 'ether').toHexString()
+    }];
+    return this.provider.send('eth_sendTransaction', params);
   }
 
 }
