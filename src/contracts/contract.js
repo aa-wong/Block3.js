@@ -80,7 +80,7 @@ class Contract extends Base {
   }
 
   set network(network) {
-    super.set('network', network, Network);
+    this.set('network', network, Network);
   }
 
   get contract() {
