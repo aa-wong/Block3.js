@@ -1,37 +1,58 @@
-class TransactionManager {
-  constructor(web3) {
-    this.web3 = web3;
+import { ethers } from 'ethers';
+import Provider from './provider';
+import User from './user';
+const {
+  BigNumber,
+  utils
+} = ethers;
+
+class Transaction extends Provider {
+  // getTransactionByHash(txHash) {
+  //   return this.web3.eth.getTransaction(txHash);
+  // }
+  //
+  // async getTransactionResponse(tx) {
+  //   try {
+  //     let result = await this.web3.eth.call(tx, tx.blockNumber);
+  //
+  //     result = result.startsWith('0x') ? result : `0x${result}`;
+  //     if (result && result.substr(138)) {
+  //       const reason = this.web3.utils.toAscii(result.substr(138));
+  //
+  //       return Promise.resolve(reason);
+  //     } else {
+  //       return Promise.resolve('Transaction message not found - No return value');
+  //     }
+  //   } catch (e) {
+  //     return Promise.reject(e);
+  //   }
+  // }
+
+  toBigNumber(amount) {
+    return BigNumber.from(amount);
   }
 
-  getTransactionByHash(txHash) {
-    return this.web3.eth.getTransaction(txHash);
+  formatEther(amount) {
+    return utils.formatEther(amount);
   }
 
-  async getTransactionResponse(tx) {
-    try {
-      let result = await this.web3.eth.call(tx, tx.blockNumber);
-
-      result = result.startsWith('0x') ? result : `0x${result}`;
-      if (result && result.substr(138)) {
-        const reason = this.web3.utils.toAscii(result.substr(138));
-
-        return Promise.resolve(reason);
-      } else {
-        return Promise.resolve('Transaction message not found - No return value');
-      }
-    } catch (e) {
-      return Promise.reject(e);
-    }
+  parseEther(amount) {
+    return utils.parseEther(amount);
   }
 
-  convertToWei(amount, token) {
-    return this.web3.utils.toWei(amount, token);
+  parseUnits(amount, units) {
+    return utils.parseUnits(amount, units);
   }
 
-  async sendTransaction(from, to, value) {
-    return this.web3.eth.sendTransaction({from, to, value});
+  sendTransaction(from, to, value) {
+    const params = [{
+      from,
+      to,
+      value: utils.parseUnits(value, 'ether').toHexString()
+    }];
+
+    return this.provider.send('eth_sendTransaction', params);
   }
 }
 
-
-export default TransactionManager;
+export default Transaction;

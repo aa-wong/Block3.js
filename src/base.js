@@ -2,22 +2,24 @@ class Base {
   constructor(data = {}) {
     this._ = {};
     this.update(data);
+    this._callbacks = {};
   }
 
   get(prop, _default) {
-    return this._[prop] !== null ? this._[prop] : _default;
+    const o = this._[prop];
+
+    return o !== undefined ? o : _default;
   }
 
   set(prop, value, constructor) {
-    const constructorValidator = (value) => {
-      if (constructor) {
-        return value.constructor === constructor
-      }
-      return true;
+    if (value && this.constructorValidator(value, constructor)) this._[prop] = value;
+  }
+
+  constructorValidator(value, constructor) {
+    if (constructor) {
+      return value.constructor === constructor
     }
-    if (value && constructorValidator(value)) {
-      this._[prop] = value;
-    }
+    return true;
   }
 
   update(data = {}) {
@@ -25,8 +27,19 @@ class Base {
     return this;
   }
 
-  export() {
-    return JSON.parse(JSON.stringify(this._));
+  get export() {
+    return this._;
+  }
+
+  exportJson() {
+    return JSON.parse(JSON.stringify(this.export));
+  }
+
+  _applyCallback(key, cb) {
+    if (typeof cb === 'function') {
+      this._callbacks[key] = e => cb(e);
+    }
+    return this;
   }
 }
 

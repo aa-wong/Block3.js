@@ -1,26 +1,60 @@
-class User {
-  /**
-   * Constructor Method
-   * @param {Object} options options to apply on initialization
-   */
-  constructor(ethereum) {
-    this.ethereum = ethereum;
+import Provider from './provider';
+import Account from './account';
+
+class User extends Provider {
+  constructor(data) {
+    super(data);
+    this._callbacks
   }
 
-  /**
-   * PROPERTIES
-   */
+  get signer() {
+    return this.provider.getSigner();
+  }
+
+  async account() {
+    try {
+      const address = await this.signer.getAddress();
+
+      return Promise.resolve(new Account({ provider: this.provider, address }));
+    } catch(e) {
+      return Promise.reject(e);
+    }
+  }
+
+  signMessage(message) {
+    return this.signer.signMessage(message);
+  }
+
   accounts() {
-    return this.ethereum.request({ method: 'eth_requestAccounts' });
+    return this.provider.provider.listAccounts().map(a => {
+      return new Account({ ...this.export, address: a });
+    });
   }
 
-  /**
-   * [onRequest description]
-   * @param  {Function} cb [description]
-   * @return {[type]}      [description]
-   */
-  onAccountSwitch(cb) {
-    return this.ethereum.on('accountsChanged', cb);
+  onAccountChange(cb) {
+    this.provider.provider.on('accountsChanged', a => {
+      if (a.length < 1) {
+        return this._handleDisconnect();
+      }
+      return cb(new Account({
+        provider: this.provider,
+        address: a[0]
+      }));
+    });
+
+    return this;
+  }
+
+  onDisconnect(cb) {
+    return this._applyCallback('onDisconnect', cb);
+  }
+
+  _handleDisconnect(e) {
+    const cb = this._callbacks.onDisconnect;
+
+    if (cb) {
+      return cb();
+    }
   }
 }
 
