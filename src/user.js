@@ -6,6 +6,7 @@ class User extends Provider {
     super(data);
     this._callbacks
   }
+
   get signer() {
     return this.provider.getSigner();
   }
@@ -18,6 +19,10 @@ class User extends Provider {
     } catch(e) {
       return Promise.reject(e);
     }
+  }
+
+  signMessage(message) {
+    return this.signer.signMessage(message);
   }
 
   accounts() {

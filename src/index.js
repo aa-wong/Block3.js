@@ -3,7 +3,7 @@ import 'idempotent-babel-polyfill';
 import { ethers } from 'ethers';
 import Base from './base';
 import Contracts from './contracts';
-import blockscanABI from './blockscanABI';
+import BlockscanABI from './blockscan-abi';
 import Transaction from './transaction';
 import Block from './block';
 import ENS from './ens';
@@ -19,6 +19,10 @@ class Block3 extends Base {
     return this.ethers.utils;
   }
 
+  static get BlockscanABI() {
+    return BlockscanABI;
+  }
+
   static get Contracts() {
     return Contracts;
   }
@@ -31,14 +35,6 @@ class Block3 extends Base {
     const { ethereum } = window;
 
     return !!ethereum;
-  }
-
-  get scanApiKey() {
-    return this.get('scan_api_key');
-  }
-
-  set scanApiKey(apiKey) {
-    this.set('scan_api_key', apiKey, String);
   }
 
   get provider() {
@@ -87,13 +83,6 @@ class Block3 extends Base {
 
   getContract(network, address) {
     return this.contracts[network.chainId][address];
-  }
-
-  async loadAbi(address, network) {
-    if (!this.scanApiKey) {
-      return Promise.reject(new Error('scanApiKey or contract.abi must be set in order to load the contract.'));
-    }
-    return await blockscanABI(contract.address, this.scanApiKey, contract.network.name, this.xhr);
   }
 
   saveContract(contract) {

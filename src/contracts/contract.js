@@ -8,7 +8,8 @@ class Contract extends Base {
     super(data);
     this.address = data.address;
     this.network = data.network;
-    this._currentNetwork = this.network
+    this._currentNetwork = this.network;
+    this._callbacks = {};
     this.abi = data.abi;
     if (data.user && this.constructorValidator(data.user, User)) this.user = data.user;
 
@@ -64,10 +65,9 @@ class Contract extends Base {
     this.set('user', user, User);
 
     user.provider.on('network', (newNetwork, oldNetwork) => {
-      console.log('Contract network update');
       if (oldNetwork) {
         this._currentNetwork = new Network(newNetwork);
-        console.log(this._currentNetwork);
+
         if (this._currentNetwork !== this.network) {
           this.resetCallbacks();
         }
@@ -140,7 +140,7 @@ class Contract extends Base {
     return this.user.provider.getTransactionCount(this.address);
   }
 
-  execute(abi, args=[], params = {}) {
+  async execute(abi, args=[], params = {}) {
     if (this._currentNetwork.chainId !== this.network.chainId) {
       return Promise.reject(new Error('Incompatible current network.'));
     }
@@ -171,7 +171,19 @@ class Contract extends Base {
     if (!this.user || constant) {
       return this.contract[name](...args, params);
     }
-    return this.contract.connect(this.user.signer)[name](...args, params);
+    try {
+      const res = await this.contract.connect(this.user.signer)[name](...args, params);
+
+      return Promise.resolve(res);
+    } catch (e) {
+      const extractErrorMessage = (str) => {
+        const open = str.indexOf('"message":"');
+        const end = str.indexOf('",', open);
+
+        return new Error(str.substring(open + 11, end));
+      }
+      return Promise.reject(extractErrorMessage(e.message));
+    }
   }
 
   event(abi, cb) {
@@ -190,7 +202,7 @@ class Contract extends Base {
       return Promise.reject(new Error('Invalid ABI. Should be of type `event`'));
     }
 
-    this._callbacks[name] = this.contract.on(name, cb);
+    this.contract.on(name, cb);
     return Promise.resolve(this);
   }
 
