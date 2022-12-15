@@ -1,30 +1,30 @@
-import { ethers } from 'ethers';
-import Base from '../base';
-import User from '../user';
-import Network from '../networks/network';
+const { ethers } = require('ethers');
+const Account = require('../accounts/account');
+const Network = require('../networks/network');
 
-class Contract extends Base {
+class Contract extends Account {
   constructor(data = {}) {
     super(data);
-    this.address = data.address;
-    this.network = data.network;
     this._currentNetwork = this.network;
     this._callbacks = {};
+    this._functionIndex = {};
+    this._eventIndex = {};
     this.abi = data.abi;
-    if (data.user && this.constructorValidator(data.user, User)) this.user = data.user;
 
-    if (!this.address || !this.network || !this.abi || !this.user) {
-      throw new Error('Valid address, users, abi and network is required to create contract instance');
+    this.provider.on('network', (newNetwork, oldNetwork) => {
+      if (oldNetwork) {
+        this._currentNetwork = new Network(newNetwork);
+
+        if (this._currentNetwork !== this.network) {
+          this.resetCallbacks();
+        }
+      }
+    });
+
+    if (!this.address || !this.network) {
+      throw new Error('Valid address and network is required to create contract instance');
     }
     this.resetCallbacks();
-  }
-
-  get address() {
-    return this.get('address');
-  }
-
-  set address(a) {
-    this.set('address', a, String);
   }
 
   get abi() {
@@ -45,7 +45,11 @@ class Contract extends Base {
           if (k.stateMutability === 'view') v.push(k);
           else if (k.stateMutability === 'payable') p.push(k);
           else n.push(k);
-        } else if (k.type === 'event') e.push(k);
+          this._functionIndex[k.name] = k;
+        } else if (k.type === 'event') {
+          e.push(k);
+          this._eventIndex[k.name] = k;
+        }
       }
       this._payables = p;
       this._nonpayables = n;
@@ -55,24 +59,6 @@ class Contract extends Base {
 
       super.set('abi', a);
     }
-  }
-
-  get user() {
-    return this.get('user');
-  }
-
-  set user(user) {
-    this.set('user', user, User);
-
-    user.provider.on('network', (newNetwork, oldNetwork) => {
-      if (oldNetwork) {
-        this._currentNetwork = new Network(newNetwork);
-
-        if (this._currentNetwork !== this.network) {
-          this.resetCallbacks();
-        }
-      }
-    });
   }
 
   get network() {
@@ -87,7 +73,7 @@ class Contract extends Base {
     if (this._contract) {
       return this._contract;
     }
-    this._contract = new ethers.Contract(this.address, this.abi, this.user.provider);
+    this._contract = new ethers.Contract(this.address, this.abi, this.provider);
 
     return this._contract;
   }
@@ -121,31 +107,53 @@ class Contract extends Base {
   }
 
   getEnsName() {
-    return this.user.provider.lookupAddress(this.address);
+    return this.provider.lookupAddress(this.address);
   }
 
   balance() {
-    return this.user.provider.getBalance(this.address);
+    return this.provider.getBalance(this.address);
   }
 
   code() {
-    return this.user.provider.getCode(this.address);
+    return this.provider.getCode(this.address);
   }
 
   storage() {
-    return this.user.provider.getStorageAt(this.address, 0);
+    return this.provider.getStorageAt(this.address, 0);
   }
 
   transactionCount() {
-    return this.user.provider.getTransactionCount(this.address);
+    return this.provider.getTransactionCount(this.address);
   }
 
-  async execute(abi, args=[], params = {}) {
+  async getAllTransactions() {
+    let blockNumber = 0;
+    const limit = 100;
+    let hasMore = true;
+    let transactions = [];
+
+    while (hasMore) {
+      try {
+        const response = await this.contract.queryFilter(filter, blockNumber, blockNumber + limit);
+
+        blockNumber = response.blockNumber + limit;
+        transactions.push(...response.results);
+        hasMore = response.results.length === limit;
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    }
+    return Promise.resolve(transactions);
+  }
+
+  async execute(signer, abiName, args=[], params = {}) {
     if (this._currentNetwork.chainId !== this.network.chainId) {
       return Promise.reject(new Error('Incompatible current network.'));
     }
+    const abi = this._functionIndex[abiName];
+
     if (!abi) {
-      return Promise.reject(new Error('abi parameter is required.'));
+      return Promise.reject(new Error(`function named ${abiName} is not found in the ABI function map.`));
     }
     const {
       type,
@@ -168,11 +176,12 @@ class Contract extends Base {
       return Promise.reject(new Error('Payable methods requires value parameter to be provided.'));
     }
 
-    if (!this.user || constant) {
+    if (constant) {
       return this.contract[name](...args, params);
     }
+
     try {
-      const res = await this.contract.connect(this.user.signer)[name](...args, params);
+      const res = await this.contract.connect(signer)[name](...args, params);
 
       return Promise.resolve(res);
     } catch (e) {
@@ -186,10 +195,12 @@ class Contract extends Base {
     }
   }
 
-  event(abi, cb) {
+  event(abiName, cb) {
     if (this._currentNetwork.chainId !== this.network.chainId) {
       return Promise.reject(new Error('Incompatible current network.'));
     }
+    const abi = this._eventIndex[abiName];
+
     if (!abi || !cb || typeof cb !== 'function') {
       return Promise.reject(new Error('abi and valid callback function is required.'));
     }
@@ -216,4 +227,4 @@ class Contract extends Base {
   }
 }
 
-export default Contract;
+module.exports = Contract;

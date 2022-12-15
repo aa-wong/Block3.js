@@ -1,4 +1,4 @@
-import Base from '../base';
+const Base = require('../base');
 
 class Network extends Base {
   get chainId() {
@@ -14,4 +14,4 @@ class Network extends Base {
   }
 }
 
-export default Network;
+module.exports = Network;

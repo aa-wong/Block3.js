@@ -1,5 +1,5 @@
-import Provider from '../provider';
-import Account from '../account';
+const Provider = require('../provider');
+const Account = require('../accounts/account');
 
 class ENSResolver extends Provider {
   get provider() {
@@ -79,4 +79,4 @@ class ENSResolver extends Provider {
   }
 }
 
-export default ENSResolver;
+module.exports = ENSResolver;

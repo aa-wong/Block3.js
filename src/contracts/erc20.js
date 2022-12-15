@@ -1,45 +1,45 @@
-import Contract from './contract';
+const Contract = require('./contract');
 
 class ERC20 extends Contract {
-  name() {
-    return this.contract.execute('name');
+  name(signer) {
+    return this.contract.execute(signer, 'name');
   }
 
-  symbol() {
-    return this.contract.execute('symbol');
+  symbol(signer) {
+    return this.contract.execute(signer, 'symbol');
   }
 
-  burn(tokenId, params = {}) {
-    return this.contract.execute('burn', [tokenId], params);
+  burn(signer, tokenId, params = {}) {
+    return this.contract.execute(signer, 'burn', [tokenId], params);
   }
 
-  mint(address, params = {}) {
-    return this.contract.execute('mint', [address], params);
+  mint(signer, address, params = {}) {
+    return this.contract.execute(signer, 'mint', [address], params);
   }
 
-  transferFrom(from, to, id) {
-    return this.contract.execute('transferFrom', [from, to, id]);
+  transferFrom(signer, from, to, id) {
+    return this.contract.execute(signer, 'transferFrom', [from, to, id]);
   }
 
-  transferTo(to, id) {
-    return this.contract.execute('transferTo', [to, id]);
+  transferTo(signer, to, id) {
+    return this.contract.execute(signer, 'transferTo', [to, id]);
   }
 
-  transferOwnership(to) {
-    return this.contract.execute('transferOwnership', [to]);
+  transferOwnership(signer, to) {
+    return this.contract.execute(signer, 'transferOwnership', [to]);
   }
 
-  totalSupply() {
-    return this.contract.execute('totalSupply');
+  totalSupply(signer) {
+    return this.contract.execute(signer, 'totalSupply');
   }
 
-  ownerOf(id) {
-    return this.contract.execute('ownerOf', [id]);
+  ownerOf(signer, id) {
+    return this.contract.execute(signer, 'ownerOf', [id]);
   }
 
-  balanceOf(address) {
-    return this.contract.execute('balanceOf', [address]);
+  balanceOf(signer, address) {
+    return this.contract.execute(signer, 'balanceOf', [address]);
   }
 }
 
-export default ERC20;
+module.exports = ERC20;

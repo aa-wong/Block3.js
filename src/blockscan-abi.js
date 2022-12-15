@@ -1,5 +1,5 @@
-import { Http } from './utils';
-import Base from './base';
+const { Http } = require('./utils');
+const Base = require('./base');
 
 class BlockscanABI extends Base {
   get apiKey() {
@@ -16,10 +16,10 @@ class BlockscanABI extends Base {
     }
     const http = new Http();
     let chain = 'api';
+
     if (xhr) http.xhr = xhr;
     if (network && network.name !== 'homestead') chain += `-${network.name}`;
     http.host = `https://${chain}.etherscan.io`;
-    console.log(http.host);
 
     try {
       const {
@@ -44,4 +44,4 @@ class BlockscanABI extends Base {
   }
 }
 
-export default BlockscanABI;
+module.exports = BlockscanABI;

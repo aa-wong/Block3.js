@@ -1,14 +1,12 @@
-import 'babel-register';
-import 'idempotent-babel-polyfill';
-import { ethers } from 'ethers';
-import Base from './base';
-import Contracts from './contracts';
-import BlockscanABI from './blockscan-abi';
-import Transaction from './transaction';
-import Block from './block';
-import ENS from './ens';
-import Networks from './networks';
-import User from './user';
+const { ethers } = require('ethers');
+const Base = require('./base');
+const Contracts = require('./contracts');
+const BlockscanABI = require('./blockscan-abi');
+const Transactions = require('./transactions');
+const Blocks = require('./blocks');
+const ENS = require('./ens');
+const Networks = require('./networks');
+const User = require('./user');
 
 class Block3 extends Base {
   static get ethers() {
@@ -53,24 +51,24 @@ class Block3 extends Base {
     this.set('contracts', c, Object);
   }
 
-  get block() {
-    return new Block({ provider: this.provider });
+  get blocks() {
+    return new Blocks({ block3: this });
   }
 
   get user() {
-    return new User({ provider: this.provider });
+    return new User({ block3: this });
   }
 
-  get transaction() {
-    return new Transaction({ provider: this.provider });
+  get transactions() {
+    return new Transactions({ block3: this });
   }
 
   get networks() {
-    return new Networks({ provider: this.provider });
+    return new Networks({ block3: this });
   }
 
   get ens() {
-    return new ENS({ provider: this.provider });
+    return new ENS({ block3: this });
   }
 
   get xhr() {
@@ -108,12 +106,4 @@ class Block3 extends Base {
   }
 }
 
-(_export => {
-  try {
-    window.Block3 = _export;
-  } catch (e) {
-    module.exports = _export;
-  }
-})(Block3);
-
-export default Block3;
+module.exports = Block3;

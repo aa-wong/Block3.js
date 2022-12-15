@@ -23,4 +23,4 @@ const XMLParser = (node) => {
 	return data;
 }
 
-export default XMLParser;
+module.exports = XMLParser;

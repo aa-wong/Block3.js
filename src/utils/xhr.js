@@ -1,4 +1,5 @@
-import XMLParser from './xml-json-parser';
+const XMLParser = require('./xml-json-parser');
+const { XMLHttpRequest } = require('xmlhttprequest');
 
 const Method = Object.freeze({
   GET: 'GET',
@@ -23,7 +24,7 @@ const Method = Object.freeze({
   }
 });
 
-const httpSession = (xhr, request, callbacks) => {
+  const httpSession = (xhr, request, callbacks) => {
   return new Promise((resolve, reject) => {
     let { method, url, headers, body } = request;
 
@@ -35,7 +36,7 @@ const httpSession = (xhr, request, callbacks) => {
     xhr.onload = async () => {
       try {
         let res = xhr.response;
-
+        console.log(res);
         if (xhr.responseXML) {
           res = XMLParser(xhr.responseXML.documentElement);
         } else if (res && res.constructor === String) {
@@ -80,17 +81,17 @@ const httpSession = (xhr, request, callbacks) => {
       return reject(e);
     };
 
-    xhr.upload.onprogress = e => {
-      const cb = callbacks.onProgress;
-
-      if (cb) {
-        return cb(e);
-      }
-    };
-
-    xhr.upload.onerror = e => {
-      return reject(e);
-    };
+    // xhr.upload.onprogress = e => {
+    //   const cb = callbacks.onProgress;
+    //
+    //   if (cb) {
+    //     return cb(e);
+    //   }
+    // };
+    //
+    // xhr.upload.onerror = e => {
+    //   return reject(e);
+    // };
 
     xhr.open(method || Method.GET, url, true);
 
@@ -308,6 +309,7 @@ class Http {
         request.url = request.url.concat(queryConstructor(request.queries));
         delete request.queries;
       }
+      console.log(request.url);
       this._handleRequest(request);
 
       try {
@@ -401,4 +403,4 @@ class Http {
   }
 }
 
-export default Http;
+module.exports = Http;

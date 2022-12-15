@@ -1,5 +1,5 @@
-import Provider from '../provider';
-import Network from './network';
+const Provider = require('../provider');
+const Network = require('./network');
 
 class Networks extends Provider {
   async current() {
@@ -57,4 +57,4 @@ class Networks extends Provider {
   }
 }
 
-export default Networks;
+module.exports = Networks;

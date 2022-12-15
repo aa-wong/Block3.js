@@ -1,4 +1,4 @@
-import Provider from './provider';
+const Provider = require('../provider');
 
 class Account extends Provider {
   get address() {

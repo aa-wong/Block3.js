@@ -1,9 +1,9 @@
-import ERC20 from './erc20';
+const ERC20 = require('./erc20');
 
 class ERC721 extends ERC20 {
-  tokenURI(id) {
-    return this.contract.execute('tokenURI', [id]);
+  tokenURI(signer, id) {
+    return this.contract.execute(signer, 'tokenURI', [id]);
   }
 }
 
-export default ERC721;
+module.exports = ERC721;
