@@ -1,5 +1,5 @@
-const { ethers } = require('ethers');
-const Provider = require('../provider');
+import { ethers } from 'ethers';
+import Provider from '../provider';
 const {
   BigNumber,
   utils
@@ -75,4 +75,4 @@ class Block extends Provider {
   }
 }
 
-module.exports = Block;
+export default Block;

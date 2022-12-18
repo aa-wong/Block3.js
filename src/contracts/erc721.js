@@ -1,4 +1,4 @@
-const ERC20 = require('./erc20');
+import ERC20 from './erc20';
 
 class ERC721 extends ERC20 {
   tokenURI(signer, id) {
@@ -6,4 +6,4 @@ class ERC721 extends ERC20 {
   }
 }
 
-module.exports = ERC721;
+export default ERC721;

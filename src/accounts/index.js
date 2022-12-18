@@ -1,5 +1,5 @@
-const ProviderCollection = require('../provider-collection');
-const Account = require('./account');
+import ProviderCollection from '../provider-collection';
+import Account from './account';
 
 class Accounts extends ProviderCollection {
   constructor(data) {
@@ -34,4 +34,4 @@ class Accounts extends ProviderCollection {
   }
 }
 
-module.exports = Accounts;
+export default Accounts;

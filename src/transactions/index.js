@@ -1,6 +1,6 @@
-const { ethers } = require('ethers');
-const ProviderCollection = require('../provider-collection');
-const Transaction = require('./transaction');
+import { ethers } from 'ethers';
+import ProviderCollection from '../provider-collection';
+import Transaction from './transaction';
 const {
   BigNumber,
   utils
@@ -61,4 +61,4 @@ class Transactions extends ProviderCollection {
   }
 }
 
-module.exports = Transactions;
+export default Transactions;

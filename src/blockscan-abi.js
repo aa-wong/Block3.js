@@ -1,5 +1,5 @@
-const { Http } = require('./utils');
-const Base = require('./base');
+import { Http } from './utils';
+import Base from './base';
 
 class BlockscanABI extends Base {
   get apiKey() {
@@ -44,4 +44,4 @@ class BlockscanABI extends Base {
   }
 }
 
-module.exports = BlockscanABI;
+export default BlockscanABI;

@@ -109,4 +109,4 @@ class BaseCollection {
   }
 }
 
-module.exports = BaseCollection;
+export default BaseCollection;

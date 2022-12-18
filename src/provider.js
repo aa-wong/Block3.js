@@ -1,4 +1,4 @@
-const Base = require('./base');
+import Base from './base';
 
 class Provider extends Base {
   constructor(data = {}) {
@@ -25,4 +25,4 @@ class Provider extends Base {
   }
 }
 
-module.exports = Provider;
+export default Provider;

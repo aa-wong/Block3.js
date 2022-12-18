@@ -1,5 +1,5 @@
-const ProviderCollection = require('../provider-collection');
-const Block = require('./block');
+import ProviderCollection from '../provider-collection';
+import Block from './block';
 
 class Blocks extends ProviderCollection {
   constructor(data) {
@@ -65,4 +65,4 @@ class Blocks extends ProviderCollection {
   }
 }
 
-module.exports = Blocks;
+export default Blocks;

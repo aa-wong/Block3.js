@@ -1,5 +1,5 @@
-const Provider = require('./provider');
-const Account = require('./accounts/account');
+import Provider from './provider';
+import Account from './accounts/account';
 
 class User extends Provider {
   constructor(data) {
@@ -57,5 +57,4 @@ class User extends Provider {
     }
   }
 }
-
-module.exports = User;
+export default User;

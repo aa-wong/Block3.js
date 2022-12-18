@@ -1,12 +1,12 @@
-const { ethers } = require('ethers');
-const Base = require('./base');
-const Contracts = require('./contracts');
-const BlockscanABI = require('./blockscan-abi');
-const Transactions = require('./transactions');
-const Blocks = require('./blocks');
-const ENS = require('./ens');
-const Networks = require('./networks');
-const User = require('./user');
+import { ethers } from 'ethers';
+import Base from './base';
+import Contracts from './contracts';
+import BlockscanABI from './blockscan-abi';
+import Transactions from './transactions';
+import Blocks from './blocks';
+import ENS from './ens';
+import Networks from './networks';
+import User from './user';
 
 class Block3 extends Base {
   static get ethers() {
@@ -106,4 +106,4 @@ class Block3 extends Base {
   }
 }
 
-module.exports = Block3;
+export default Block3;

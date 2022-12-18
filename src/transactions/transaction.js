@@ -1,5 +1,5 @@
-const { ethers } = require('ethers');
-const Provider = require('../provider');
+import { ethers } from 'ethers';
+import Provider from '../provider';
 const {
   BigNumber,
   utils
@@ -102,4 +102,4 @@ class Transaction extends Provider {
   }
 }
 
-module.exports = Transaction;
+export default Transaction;

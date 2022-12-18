@@ -1,5 +1,4 @@
-const XMLParser = require('./xml-json-parser');
-const { XMLHttpRequest } = require('xmlhttprequest');
+import XMLParser from './xml-json-parser';
 
 const Method = Object.freeze({
   GET: 'GET',
@@ -403,4 +402,4 @@ class Http {
   }
 }
 
-module.exports = Http;
+export default Http;

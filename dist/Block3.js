@@ -2,7 +2,7 @@
  * Block3
  * Block3 - a front Javascript Library to easily manage Web3.js interactions with Smart Contracts
  * 
- * @version v1.0.0
+ * @version v2.0.0
  * @author Aaron Wong <aaron@creationsbyawe.com>
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -31422,12 +31422,15 @@ module.exports = function(module) {
 /*!*********************************!*\
   !*** ./src/accounts/account.js ***!
   \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Provider = __webpack_require__(/*! ../provider */ "./src/provider.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../provider */ "./src/provider.js");
 
-class Account extends Provider {
+
+class Account extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   get address() {
     return this.get('address');
   }
@@ -31458,7 +31461,7 @@ class Account extends Provider {
 
 }
 
-module.exports = Account;
+/* harmony default export */ __webpack_exports__["default"] = (Account);
 
 /***/ }),
 
@@ -31466,9 +31469,11 @@ module.exports = Account;
 /*!********************************!*\
   !*** ./src/base-collection.js ***!
   \********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 class BaseCollection {
   constructor(metaType, data) {
     this._ = {};
@@ -31586,7 +31591,7 @@ class BaseCollection {
 
 }
 
-module.exports = BaseCollection;
+/* harmony default export */ __webpack_exports__["default"] = (BaseCollection);
 
 /***/ }),
 
@@ -31594,9 +31599,11 @@ module.exports = BaseCollection;
 /*!*********************!*\
   !*** ./src/base.js ***!
   \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 class Base {
   constructor(data = {}) {
     this._ = {};
@@ -31644,7 +31651,7 @@ class Base {
 
 }
 
-module.exports = Base;
+/* harmony default export */ __webpack_exports__["default"] = (Base);
 
 /***/ }),
 
@@ -31652,21 +31659,21 @@ module.exports = Base;
 /*!*****************************!*\
   !*** ./src/blocks/block.js ***!
   \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const {
-  ethers
-} = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var ethers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../provider */ "./src/provider.js");
 
-const Provider = __webpack_require__(/*! ../provider */ "./src/provider.js");
 
 const {
   BigNumber,
   utils
-} = ethers;
+} = ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"];
 
-class Block extends Provider {
+class Block extends _provider__WEBPACK_IMPORTED_MODULE_1__["default"] {
   get hash() {
     return this.get('hash');
   }
@@ -31741,7 +31748,7 @@ class Block extends Provider {
 
 }
 
-module.exports = Block;
+/* harmony default export */ __webpack_exports__["default"] = (Block);
 
 /***/ }),
 
@@ -31749,16 +31756,19 @@ module.exports = Block;
 /*!*****************************!*\
   !*** ./src/blocks/index.js ***!
   \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const ProviderCollection = __webpack_require__(/*! ../provider-collection */ "./src/provider-collection.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _provider_collection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../provider-collection */ "./src/provider-collection.js");
+/* harmony import */ var _block__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./block */ "./src/blocks/block.js");
 
-const Block = __webpack_require__(/*! ./block */ "./src/blocks/block.js");
 
-class Blocks extends ProviderCollection {
+
+class Blocks extends _provider_collection__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor(data) {
-    super(Block, data);
+    super(_block__WEBPACK_IMPORTED_MODULE_1__["default"], data);
   }
 
   async current(tx) {
@@ -31820,7 +31830,7 @@ class Blocks extends ProviderCollection {
 
 }
 
-module.exports = Blocks;
+/* harmony default export */ __webpack_exports__["default"] = (Blocks);
 
 /***/ }),
 
@@ -31828,16 +31838,17 @@ module.exports = Blocks;
 /*!******************************!*\
   !*** ./src/blockscan-abi.js ***!
   \******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const {
-  Http
-} = __webpack_require__(/*! ./utils */ "./src/utils/index.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils/index.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./base */ "./src/base.js");
 
-const Base = __webpack_require__(/*! ./base */ "./src/base.js");
 
-class BlockscanABI extends Base {
+
+class BlockscanABI extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
   get apiKey() {
     return this.get('api_key');
   }
@@ -31851,12 +31862,11 @@ class BlockscanABI extends Base {
       return Promise.reject(new Error('apiKey must be set in order to retrieve ABI.'));
     }
 
-    const http = new Http();
+    const http = new _utils__WEBPACK_IMPORTED_MODULE_0__["Http"]();
     let chain = 'api';
     if (xhr) http.xhr = xhr;
     if (network && network.name !== 'homestead') chain += `-${network.name}`;
     http.host = `https://${chain}.etherscan.io`;
-    console.log(http.host);
 
     try {
       const {
@@ -31882,7 +31892,7 @@ class BlockscanABI extends Base {
 
 }
 
-module.exports = BlockscanABI;
+/* harmony default export */ __webpack_exports__["default"] = (BlockscanABI);
 
 /***/ }),
 
@@ -31890,18 +31900,19 @@ module.exports = BlockscanABI;
 /*!***********************************!*\
   !*** ./src/contracts/contract.js ***!
   \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const {
-  ethers
-} = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var ethers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+/* harmony import */ var _accounts_account__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../accounts/account */ "./src/accounts/account.js");
+/* harmony import */ var _networks_network__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../networks/network */ "./src/networks/network.js");
 
-const Account = __webpack_require__(/*! ../accounts/account */ "./src/accounts/account.js");
 
-const Network = __webpack_require__(/*! ../networks/network */ "./src/networks/network.js");
 
-class Contract extends Account {
+
+class Contract extends _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"] {
   constructor(data = {}) {
     super(data);
     this._currentNetwork = this.network;
@@ -31911,7 +31922,7 @@ class Contract extends Account {
     this.abi = data.abi;
     this.provider.on('network', (newNetwork, oldNetwork) => {
       if (oldNetwork) {
-        this._currentNetwork = new Network(newNetwork);
+        this._currentNetwork = new _networks_network__WEBPACK_IMPORTED_MODULE_2__["default"](newNetwork);
 
         if (this._currentNetwork !== this.network) {
           this.resetCallbacks();
@@ -31964,7 +31975,7 @@ class Contract extends Account {
   }
 
   set network(network) {
-    this.set('network', network, Network);
+    this.set('network', network, _networks_network__WEBPACK_IMPORTED_MODULE_2__["default"]);
   }
 
   get contract() {
@@ -31972,7 +31983,7 @@ class Contract extends Account {
       return this._contract;
     }
 
-    this._contract = new ethers.Contract(this.address, this.abi, this.provider);
+    this._contract = new ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"].Contract(this.address, this.abi, this.provider);
     return this._contract;
   }
 
@@ -32022,6 +32033,26 @@ class Contract extends Account {
 
   transactionCount() {
     return this.provider.getTransactionCount(this.address);
+  }
+
+  async getAllTransactions() {
+    let blockNumber = 0;
+    const limit = 100;
+    let hasMore = true;
+    let transactions = [];
+
+    while (hasMore) {
+      try {
+        const response = await this.contract.queryFilter(filter, blockNumber, blockNumber + limit);
+        blockNumber = response.blockNumber + limit;
+        transactions.push(...response.results);
+        hasMore = response.results.length === limit;
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    }
+
+    return Promise.resolve(transactions);
   }
 
   async execute(signer, abiName, args = [], params = {}) {
@@ -32109,7 +32140,7 @@ class Contract extends Account {
 
 }
 
-module.exports = Contract;
+/* harmony default export */ __webpack_exports__["default"] = (Contract);
 
 /***/ }),
 
@@ -32117,12 +32148,15 @@ module.exports = Contract;
 /*!********************************!*\
   !*** ./src/contracts/erc20.js ***!
   \********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Contract = __webpack_require__(/*! ./contract */ "./src/contracts/contract.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _contract__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./contract */ "./src/contracts/contract.js");
 
-class ERC20 extends Contract {
+
+class ERC20 extends _contract__WEBPACK_IMPORTED_MODULE_0__["default"] {
   name(signer) {
     return this.contract.execute(signer, 'name');
   }
@@ -32165,7 +32199,7 @@ class ERC20 extends Contract {
 
 }
 
-module.exports = ERC20;
+/* harmony default export */ __webpack_exports__["default"] = (ERC20);
 
 /***/ }),
 
@@ -32173,19 +32207,22 @@ module.exports = ERC20;
 /*!*********************************!*\
   !*** ./src/contracts/erc721.js ***!
   \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const ERC20 = __webpack_require__(/*! ./erc20 */ "./src/contracts/erc20.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _erc20__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./erc20 */ "./src/contracts/erc20.js");
 
-class ERC721 extends ERC20 {
+
+class ERC721 extends _erc20__WEBPACK_IMPORTED_MODULE_0__["default"] {
   tokenURI(signer, id) {
     return this.contract.execute(signer, 'tokenURI', [id]);
   }
 
 }
 
-module.exports = ERC721;
+/* harmony default export */ __webpack_exports__["default"] = (ERC721);
 
 /***/ }),
 
@@ -32193,31 +32230,34 @@ module.exports = ERC721;
 /*!********************************!*\
   !*** ./src/contracts/index.js ***!
   \********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Contract = __webpack_require__(/*! ./contract */ "./src/contracts/contract.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _contract__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./contract */ "./src/contracts/contract.js");
+/* harmony import */ var _erc20__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./erc20 */ "./src/contracts/erc20.js");
+/* harmony import */ var _erc721__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./erc721 */ "./src/contracts/erc721.js");
 
-const ERC20 = __webpack_require__(/*! ./erc20 */ "./src/contracts/erc20.js");
 
-const ERC721 = __webpack_require__(/*! ./erc721 */ "./src/contracts/erc721.js");
+
 
 class Contracts {
   static get Contract() {
-    return Contract;
+    return _contract__WEBPACK_IMPORTED_MODULE_0__["default"];
   }
 
   static get ERC20() {
-    return ERC20;
+    return _erc20__WEBPACK_IMPORTED_MODULE_1__["default"];
   }
 
   static get ERC721() {
-    return ERC721;
+    return _erc721__WEBPACK_IMPORTED_MODULE_2__["default"];
   }
 
 }
 
-module.exports = Contracts;
+/* harmony default export */ __webpack_exports__["default"] = (Contracts);
 
 /***/ }),
 
@@ -32225,16 +32265,19 @@ module.exports = Contracts;
 /*!**************************!*\
   !*** ./src/ens/index.js ***!
   \**************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Provider = __webpack_require__(/*! ../provider */ "./src/provider.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../provider */ "./src/provider.js");
+/* harmony import */ var _contracts_contract__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../contracts/contract */ "./src/contracts/contract.js");
+/* harmony import */ var _resolver__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./resolver */ "./src/ens/resolver.js");
 
-const Contract = __webpack_require__(/*! ../contracts/contract */ "./src/contracts/contract.js");
 
-const ENSResolver = __webpack_require__(/*! ./resolver */ "./src/ens/resolver.js");
 
-class ENS extends Provider {
+
+class ENS extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   async getAddressByName(name, abi) {
     try {
       const address = await this.provider.resolveName(name);
@@ -32242,7 +32285,7 @@ class ENS extends Provider {
 
       if (address) {
         if (abi) {
-          account = new Contract({ ...this.export,
+          account = new _contracts_contract__WEBPACK_IMPORTED_MODULE_1__["default"]({ ...this.export,
             address,
             abi
           });
@@ -32267,7 +32310,7 @@ class ENS extends Provider {
     try {
       const r = await this.provider.getResolver(name);
       let resolver;
-      if (r) resolver = new ENSResolver({ ...this.export,
+      if (r) resolver = new _resolver__WEBPACK_IMPORTED_MODULE_2__["default"]({ ...this.export,
         r
       });
       return Promise.resolve(resolver);
@@ -32278,7 +32321,7 @@ class ENS extends Provider {
 
 }
 
-module.exports = ENS;
+/* harmony default export */ __webpack_exports__["default"] = (ENS);
 
 /***/ }),
 
@@ -32286,14 +32329,17 @@ module.exports = ENS;
 /*!*****************************!*\
   !*** ./src/ens/resolver.js ***!
   \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Provider = __webpack_require__(/*! ../provider */ "./src/provider.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../provider */ "./src/provider.js");
+/* harmony import */ var _accounts_account__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../accounts/account */ "./src/accounts/account.js");
 
-const Account = __webpack_require__(/*! ../accounts/account */ "./src/accounts/account.js");
 
-class ENSResolver extends Provider {
+
+class ENSResolver extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   get provider() {
     return this.get('resolver');
   }
@@ -32306,7 +32352,7 @@ class ENSResolver extends Provider {
     try {
       const address = await this.resolver.address();
       let account;
-      if (address) account = new Account({ ...this.export,
+      if (address) account = new _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]({ ...this.export,
         address
       });
       return Promise.resolve(account);
@@ -32373,7 +32419,7 @@ class ENSResolver extends Provider {
 
 }
 
-module.exports = ENSResolver;
+/* harmony default export */ __webpack_exports__["default"] = (ENSResolver);
 
 /***/ }),
 
@@ -32381,32 +32427,33 @@ module.exports = ENSResolver;
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const {
-  ethers
-} = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var ethers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./base */ "./src/base.js");
+/* harmony import */ var _contracts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./contracts */ "./src/contracts/index.js");
+/* harmony import */ var _blockscan_abi__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./blockscan-abi */ "./src/blockscan-abi.js");
+/* harmony import */ var _transactions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./transactions */ "./src/transactions/index.js");
+/* harmony import */ var _blocks__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./blocks */ "./src/blocks/index.js");
+/* harmony import */ var _ens__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ens */ "./src/ens/index.js");
+/* harmony import */ var _networks__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./networks */ "./src/networks/index.js");
+/* harmony import */ var _user__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./user */ "./src/user.js");
 
-const Base = __webpack_require__(/*! ./base */ "./src/base.js");
 
-const Contracts = __webpack_require__(/*! ./contracts */ "./src/contracts/index.js");
 
-const BlockscanABI = __webpack_require__(/*! ./blockscan-abi */ "./src/blockscan-abi.js");
 
-const Transactions = __webpack_require__(/*! ./transactions */ "./src/transactions/index.js");
 
-const Blocks = __webpack_require__(/*! ./blocks */ "./src/blocks/index.js");
 
-const ENS = __webpack_require__(/*! ./ens */ "./src/ens/index.js");
 
-const Networks = __webpack_require__(/*! ./networks */ "./src/networks/index.js");
 
-const User = __webpack_require__(/*! ./user */ "./src/user.js");
 
-class Block3 extends Base {
+
+class Block3 extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
   static get ethers() {
-    return ethers;
+    return ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"];
   }
 
   static get utils() {
@@ -32414,15 +32461,15 @@ class Block3 extends Base {
   }
 
   static get BlockscanABI() {
-    return BlockscanABI;
+    return _blockscan_abi__WEBPACK_IMPORTED_MODULE_3__["default"];
   }
 
   static get Contracts() {
-    return Contracts;
+    return _contracts__WEBPACK_IMPORTED_MODULE_2__["default"];
   }
 
   static get providers() {
-    return ethers.providers;
+    return ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"].providers;
   }
 
   static get isWeb3Supported() {
@@ -32449,31 +32496,31 @@ class Block3 extends Base {
   }
 
   get blocks() {
-    return new Blocks({
+    return new _blocks__WEBPACK_IMPORTED_MODULE_5__["default"]({
       block3: this
     });
   }
 
   get user() {
-    return new User({
+    return new _user__WEBPACK_IMPORTED_MODULE_8__["default"]({
       block3: this
     });
   }
 
   get transactions() {
-    return new Transactions({
+    return new _transactions__WEBPACK_IMPORTED_MODULE_4__["default"]({
       block3: this
     });
   }
 
   get networks() {
-    return new Networks({
+    return new _networks__WEBPACK_IMPORTED_MODULE_7__["default"]({
       block3: this
     });
   }
 
   get ens() {
-    return new ENS({
+    return new _ens__WEBPACK_IMPORTED_MODULE_6__["default"]({
       block3: this
     });
   }
@@ -32514,7 +32561,7 @@ class Block3 extends Base {
 
 }
 
-module.exports = Block3;
+/* harmony default export */ __webpack_exports__["default"] = (Block3);
 
 /***/ }),
 
@@ -32522,18 +32569,21 @@ module.exports = Block3;
 /*!*******************************!*\
   !*** ./src/networks/index.js ***!
   \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Provider = __webpack_require__(/*! ../provider */ "./src/provider.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../provider */ "./src/provider.js");
+/* harmony import */ var _network__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./network */ "./src/networks/network.js");
 
-const Network = __webpack_require__(/*! ./network */ "./src/networks/network.js");
 
-class Networks extends Provider {
+
+class Networks extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   async current() {
     try {
       const n = await this.provider.getNetwork();
-      return Promise.resolve(new Network(n));
+      return Promise.resolve(new _network__WEBPACK_IMPORTED_MODULE_1__["default"](n));
     } catch (e) {
       return Promise.reject(e);
     }
@@ -32576,14 +32626,14 @@ class Networks extends Provider {
   onChange(cb) {
     return this.provider.on('network', (newNetwork, oldNetwork) => {
       if (oldNetwork) {
-        return cb(new Network(newNetwork), new Network(oldNetwork));
+        return cb(new _network__WEBPACK_IMPORTED_MODULE_1__["default"](newNetwork), new _network__WEBPACK_IMPORTED_MODULE_1__["default"](oldNetwork));
       }
     });
   }
 
 }
 
-module.exports = Networks;
+/* harmony default export */ __webpack_exports__["default"] = (Networks);
 
 /***/ }),
 
@@ -32591,12 +32641,15 @@ module.exports = Networks;
 /*!*********************************!*\
   !*** ./src/networks/network.js ***!
   \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Base = __webpack_require__(/*! ../base */ "./src/base.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/base.js");
 
-class Network extends Base {
+
+class Network extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
   get chainId() {
     return this.get('chainId');
   }
@@ -32611,7 +32664,7 @@ class Network extends Base {
 
 }
 
-module.exports = Network;
+/* harmony default export */ __webpack_exports__["default"] = (Network);
 
 /***/ }),
 
@@ -32619,12 +32672,15 @@ module.exports = Network;
 /*!************************************!*\
   !*** ./src/provider-collection.js ***!
   \************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Collection = __webpack_require__(/*! ./base-collection */ "./src/base-collection.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _base_collection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base-collection */ "./src/base-collection.js");
 
-class ProviderCollection extends Collection {
+
+class ProviderCollection extends _base_collection__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor(metaType, data) {
     let block3;
 
@@ -32657,7 +32713,7 @@ class ProviderCollection extends Collection {
 
 }
 
-module.exports = ProviderCollection;
+/* harmony default export */ __webpack_exports__["default"] = (ProviderCollection);
 
 /***/ }),
 
@@ -32665,12 +32721,15 @@ module.exports = ProviderCollection;
 /*!*************************!*\
   !*** ./src/provider.js ***!
   \*************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Base = __webpack_require__(/*! ./base */ "./src/base.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/base.js");
 
-class Provider extends Base {
+
+class Provider extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor(data = {}) {
     let block3;
 
@@ -32697,7 +32756,7 @@ class Provider extends Base {
 
 }
 
-module.exports = Provider;
+/* harmony default export */ __webpack_exports__["default"] = (Provider);
 
 /***/ }),
 
@@ -32705,25 +32764,25 @@ module.exports = Provider;
 /*!***********************************!*\
   !*** ./src/transactions/index.js ***!
   \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const {
-  ethers
-} = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var ethers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+/* harmony import */ var _provider_collection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../provider-collection */ "./src/provider-collection.js");
+/* harmony import */ var _transaction__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./transaction */ "./src/transactions/transaction.js");
 
-const ProviderCollection = __webpack_require__(/*! ../provider-collection */ "./src/provider-collection.js");
 
-const Transaction = __webpack_require__(/*! ./transaction */ "./src/transactions/transaction.js");
 
 const {
   BigNumber,
   utils
-} = ethers;
+} = ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"];
 
-class Transactions extends ProviderCollection {
+class Transactions extends _provider_collection__WEBPACK_IMPORTED_MODULE_1__["default"] {
   constructor(data) {
-    super(Transaction, data);
+    super(_transaction__WEBPACK_IMPORTED_MODULE_2__["default"], data);
   }
 
   create(data) {
@@ -32776,7 +32835,7 @@ class Transactions extends ProviderCollection {
 
 }
 
-module.exports = Transactions;
+/* harmony default export */ __webpack_exports__["default"] = (Transactions);
 
 /***/ }),
 
@@ -32784,21 +32843,21 @@ module.exports = Transactions;
 /*!*****************************************!*\
   !*** ./src/transactions/transaction.js ***!
   \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const {
-  ethers
-} = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var ethers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ethers */ "./node_modules/ethers/lib.esm/index.js");
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../provider */ "./src/provider.js");
 
-const Provider = __webpack_require__(/*! ../provider */ "./src/provider.js");
 
 const {
   BigNumber,
   utils
-} = ethers;
+} = ethers__WEBPACK_IMPORTED_MODULE_0__["ethers"];
 
-class Transaction extends Provider {
+class Transaction extends _provider__WEBPACK_IMPORTED_MODULE_1__["default"] {
   get hash() {
     return this.get('hash');
   }
@@ -32899,7 +32958,7 @@ class Transaction extends Provider {
 
 }
 
-module.exports = Transaction;
+/* harmony default export */ __webpack_exports__["default"] = (Transaction);
 
 /***/ }),
 
@@ -32907,14 +32966,17 @@ module.exports = Transaction;
 /*!*********************!*\
   !*** ./src/user.js ***!
   \*********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Provider = __webpack_require__(/*! ./provider */ "./src/provider.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./provider */ "./src/provider.js");
+/* harmony import */ var _accounts_account__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./accounts/account */ "./src/accounts/account.js");
 
-const Account = __webpack_require__(/*! ./accounts/account */ "./src/accounts/account.js");
 
-class User extends Provider {
+
+class User extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor(data) {
     super(data);
     this._callbacks;
@@ -32927,7 +32989,7 @@ class User extends Provider {
   async account() {
     try {
       const address = await this.signer.getAddress();
-      return Promise.resolve(new Account({
+      return Promise.resolve(new _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]({
         provider: this.provider,
         address
       }));
@@ -32942,7 +33004,7 @@ class User extends Provider {
 
   accounts() {
     return this.provider.provider.listAccounts().map(a => {
-      return new Account({ ...this.export,
+      return new _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]({ ...this.export,
         address: a
       });
     });
@@ -32954,7 +33016,7 @@ class User extends Provider {
         return this._handleDisconnect();
       }
 
-      return cb(new Account({
+      return cb(new _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]({
         provider: this.provider,
         address: a[0]
       }));
@@ -32976,7 +33038,7 @@ class User extends Provider {
 
 }
 
-module.exports = User;
+/* harmony default export */ __webpack_exports__["default"] = (User);
 
 /***/ }),
 
@@ -32984,14 +33046,16 @@ module.exports = User;
 /*!****************************!*\
   !*** ./src/utils/index.js ***!
   \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: Http */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const Http = __webpack_require__(/*! ./xhr */ "./src/utils/xhr.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _xhr__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./xhr */ "./src/utils/xhr.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Http", function() { return _xhr__WEBPACK_IMPORTED_MODULE_0__["default"]; });
 
-module.exports = {
-  Http
-};
+
+
 
 /***/ }),
 
@@ -32999,10 +33063,12 @@ module.exports = {
 /*!**************************!*\
   !*** ./src/utils/xhr.js ***!
   \**************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const XMLParser = __webpack_require__(/*! ./xml-json-parser */ "./src/utils/xml-json-parser.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _xml_json_parser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./xml-json-parser */ "./src/utils/xml-json-parser.js");
 
 const Method = Object.freeze({
   GET: 'GET',
@@ -33045,9 +33111,10 @@ const httpSession = (xhr, request, callbacks) => {
     xhr.onload = async () => {
       try {
         let res = xhr.response;
+        console.log(res);
 
         if (xhr.responseXML) {
-          res = XMLParser(xhr.responseXML.documentElement);
+          res = Object(_xml_json_parser__WEBPACK_IMPORTED_MODULE_0__["default"])(xhr.responseXML.documentElement);
         } else if (res && res.constructor === String) {
           res = await JSON.parse(res);
         }
@@ -33087,19 +33154,18 @@ const httpSession = (xhr, request, callbacks) => {
 
     xhr.ontimeout = e => {
       return reject(e);
-    };
+    }; // xhr.upload.onprogress = e => {
+    //   const cb = callbacks.onProgress;
+    //
+    //   if (cb) {
+    //     return cb(e);
+    //   }
+    // };
+    //
+    // xhr.upload.onerror = e => {
+    //   return reject(e);
+    // };
 
-    xhr.upload.onprogress = e => {
-      const cb = callbacks.onProgress;
-
-      if (cb) {
-        return cb(e);
-      }
-    };
-
-    xhr.upload.onerror = e => {
-      return reject(e);
-    };
 
     xhr.open(method || Method.GET, url, true);
 
@@ -33335,6 +33401,8 @@ class Http {
         delete request.queries;
       }
 
+      console.log(request.url);
+
       this._handleRequest(request);
 
       try {
@@ -33436,7 +33504,7 @@ class Http {
 
 }
 
-module.exports = Http;
+/* harmony default export */ __webpack_exports__["default"] = (Http);
 
 /***/ }),
 
@@ -33444,9 +33512,11 @@ module.exports = Http;
 /*!**************************************!*\
   !*** ./src/utils/xml-json-parser.js ***!
   \**************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 const XMLParser = node => {
   let data = {};
 
@@ -33472,7 +33542,7 @@ const XMLParser = node => {
   return data;
 };
 
-module.exports = XMLParser;
+/* harmony default export */ __webpack_exports__["default"] = (XMLParser);
 
 /***/ }),
 

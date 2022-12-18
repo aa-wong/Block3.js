@@ -1,6 +1,6 @@
-const { ethers } = require('ethers');
-const Account = require('../accounts/account');
-const Network = require('../networks/network');
+import { ethers } from 'ethers';
+import Account from '../accounts/account';
+import Network from '../networks/network';
 
 class Contract extends Account {
   constructor(data = {}) {
@@ -227,4 +227,4 @@ class Contract extends Account {
   }
 }
 
-module.exports = Contract;
+export default Contract;

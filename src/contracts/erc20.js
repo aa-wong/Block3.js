@@ -1,4 +1,4 @@
-const Contract = require('./contract');
+import Contract from './contract';
 
 class ERC20 extends Contract {
   name(signer) {
@@ -42,4 +42,4 @@ class ERC20 extends Contract {
   }
 }
 
-module.exports = ERC20;
+export default ERC20;

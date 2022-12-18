@@ -1,4 +1,4 @@
-const Collection = require('./base-collection');
+import Collection from './base-collection';
 
 class ProviderCollection extends Collection {
   constructor(metaType, data) {
@@ -29,4 +29,4 @@ class ProviderCollection extends Collection {
   }
 }
 
-module.exports = ProviderCollection;
+export default ProviderCollection;

@@ -1,6 +1,6 @@
-const Provider = require('../provider');
-const Contract = require('../contracts/contract');
-const ENSResolver = require('./resolver');
+import Provider from '../provider';
+import Contract from '../contracts/contract';
+import ENSResolver from './resolver';
 
 class ENS extends Provider {
   async getAddressByName(name, abi) {
@@ -41,4 +41,4 @@ class ENS extends Provider {
   }
 }
 
-module.exports = ENS;
+export default ENS;

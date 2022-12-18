@@ -1,5 +1,5 @@
-const Http = require('./xhr');
+import Http from './xhr';
 
-module.exports = {
+export {
   Http
 };

@@ -1,6 +1,6 @@
-const Contract = require('./contract');
-const ERC20 = require('./erc20');
-const ERC721 = require('./erc721');
+import Contract from './contract';
+import ERC20 from './erc20';
+import ERC721 from './erc721';
 
 class Contracts {
   static get Contract() {
@@ -16,4 +16,4 @@ class Contracts {
   }
 }
 
-module.exports = Contracts;
+export default Contracts;
