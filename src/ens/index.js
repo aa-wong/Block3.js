@@ -1,5 +1,5 @@
 import Provider from '../provider';
-import Contract from '../contracts/contract';
+// import Contract from '../../contracts/contract';
 import ENSResolver from './resolver';
 
 class ENS extends Provider {
@@ -9,13 +9,13 @@ class ENS extends Provider {
       let account;
 
       if (address) {
-        if (abi) {
-          account = new Contract({
-            ...this.export,
-            address,
-            abi
-          });
-        }
+        // if (abi) {
+        //   account = new Contract({
+        //     ...this.export,
+        //     address,
+        //     abi
+        //   });
+        // }
         account = new Account({ ...this.export, address });
       }
       return Promise.resolve(account);

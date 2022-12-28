@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
-import Account from '../accounts/account';
-import Network from '../networks/network';
+import Account from '../../accounts/account';
+import Network from '../network';
 
 class Contract extends Account {
   constructor(data = {}) {

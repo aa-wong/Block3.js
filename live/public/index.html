@@ -1,10 +1,96 @@
 <html>
   <head>
     <title>Hello World!</title>
-    <script src="js/Block3.min.js" charset="utf-8"></script>
+    <script src="js/Block3.js" charset="utf-8"></script>
   </head>
   <body>
     <h1>Hello, World!</h1>
-    <img src="shark.png" alt="shark">
+    <button onclick="connect()">Connect</button>
   </body>
+  <script>
+    const connect = async () => {
+      const { ethereum } = window;
+      const {
+        AlchemyProvider,
+        Web3Provider
+      } = Block3.providers;
+      const provider = new Web3Provider(ethereum, "any");
+      // const provider = new AlchemyProvider("goerli", 'DOcUJK1wdO7VrsqEg44KNKqVvRHzS3U6');
+      const block3 = new Block3({
+        provider,
+        blockscanApiKey: "P84ZWJ7IDIPPJ44FP2QFNZ19SKDU8ZRT4G"
+      });
+
+      const {
+        user,
+        networks
+      } = block3;
+
+      try {
+        await user.connect();
+      // getAccount(user);
+      // getBlocks(blocks, transactions);
+
+      const network = await networks.current();
+
+      network.blockExplorerUrls = ['https://api-goerli.etherscan.io'];
+      const { contracts } = network;
+      const contract = await contracts.loadContract('0x80bcc19d65dE67efdda7db2B0D6bC793745F5916');
+
+      console.log(contract);
+      console.log(contracts.getAll());
+      console.log(contracts.getById('0x80bcc19d65dE67efdda7db2B0D6bC793745F5916'));
+      console.log(contract.export());
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const getAccount = async (user) => {
+      try {
+        const signer = user.signer;
+
+        console.log(await user.accounts());        
+        const account = await user.account();
+
+        console.log(account);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const getBlocks = async (blocks, transactions) => {
+      try {
+        const currentBlock = await blocks.current();
+
+        console.log(currentBlock);
+        const tx0 = currentBlock.transactions[0];
+        const transaction = await transactions.getTransaction(tx0);
+        console.log(transaction);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const loadContract = async (block3) => {
+      try {
+        const {
+          BlockscanABI,
+          Contracts
+        } = Block3;
+        const network = await block3.networks.current()
+        console.log(network);
+        const blockscan = new BlockscanABI({ api_key: 'P84ZWJ7IDIPPJ44FP2QFNZ19SKDU8ZRT4G' });
+        const abi = await blockscan.loadBlockscanAbi('0x80bcc19d65dE67efdda7db2B0D6bC793745F5916', network);
+        const contract = new Contracts.Contract({
+          network,
+          abi
+        });
+
+        console.log(contract);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  </script>
 </html>

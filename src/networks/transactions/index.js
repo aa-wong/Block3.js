@@ -1,22 +1,30 @@
 import { ethers } from 'ethers';
-import ProviderCollection from '../provider-collection';
+import Collection from '../../collection';
 import Transaction from './transaction';
 const {
   BigNumber,
   utils
 } = ethers;
 
-class Transactions extends ProviderCollection {
+class Transactions extends Collection {
   constructor(data) {
     super(Transaction, data);
   }
 
-  create(data) {
-    return super.create(data, 'hash');
+  get network() {
+    return this.get('network');
   }
 
-  createBatch(data, append) {
-    return super.createBatch(data, append, 'hash');
+  getById(id) {
+    return super.getById(id, 'hash');
+  }
+
+  create(data) {
+    return super.create(Object.assign(data, { network: this.network }), 'hash');
+  }
+
+  createBatch(data) {
+    return super.createBatch(data, { network: this.network }, 'hash');
   }
 
   async getTransaction(tx) {

@@ -35,7 +35,7 @@ const Method = Object.freeze({
     xhr.onload = async () => {
       try {
         let res = xhr.response;
-        console.log(res);
+
         if (xhr.responseXML) {
           res = XMLParser(xhr.responseXML.documentElement);
         } else if (res && res.constructor === String) {
@@ -308,7 +308,6 @@ class Http {
         request.url = request.url.concat(queryConstructor(request.queries));
         delete request.queries;
       }
-      console.log(request.url);
       this._handleRequest(request);
 
       try {

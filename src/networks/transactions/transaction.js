@@ -1,11 +1,15 @@
 import { ethers } from 'ethers';
-import Provider from '../provider';
+import Base from '../../base';
 const {
   BigNumber,
   utils
 } = ethers;
 
-class Transaction extends Provider {
+class Transaction extends Base {
+  get network() {
+    return this.get('network');
+  }
+
   get hash() {
     return this.get('hash');
   }

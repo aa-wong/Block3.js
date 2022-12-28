@@ -1,14 +1,50 @@
-import Provider from '../provider';
+import BaseCollection from '../collection';
 import Network from './network';
 
-class Networks extends Provider {
+class Networks extends BaseCollection {
+  constructor(data) {
+    super(Network, data);
+  }
+
+  getById(id) {
+    return super.getById(id, 'chainId');
+  }
+
+  create(data) {
+    const network = this.getById(data.chainId);
+
+    if (network) {
+      return network;
+    }
+    return super.create(Object.assign(data, { block3: this.block3 }), 'chainId');
+  }
+
+  createBatch(data) {
+    return super.createBatch(data, { block3: this.block3 }, 'chainId');
+  }
+
   async current() {
     try {
       const n = await this.provider.getNetwork();
 
-      return Promise.resolve(new Network(n));
+      console.log(n);
+      return Promise.resolve(this.create(n));
     } catch (e) {
       return Promise.reject(e);
+    }
+  }
+
+  async switchNetwork(network) {
+    if (isCollectionItemType(item)) {
+      try {
+        const n = await this.provider.send("wallet_addEthereumChain", [ network.export() ]);
+        
+        return Promise.resolve(this.create(n));
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    } else {
+      return Promise.reject(new Error('Invalid type, must be Network object'));
     }
   }
 
@@ -51,7 +87,7 @@ class Networks extends Provider {
   onChange(cb) {
     return this.provider.on('network', (newNetwork, oldNetwork) => {
       if (oldNetwork) {
-        return cb(new Network(newNetwork), new Network(oldNetwork));
+        return cb(this.create(newNetwork), this.create(oldNetwork));
       }
     });
   }

@@ -1,6 +1,6 @@
-import Provider from '../provider';
+import Base from "../base";
 
-class Account extends Provider {
+class Account extends Base {
   get address() {
     return this.get('address');
   }

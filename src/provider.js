@@ -1,6 +1,4 @@
-import Base from './base';
-
-class Provider extends Base {
+class Provider {
   constructor(data = {}) {
     let block3;
 
@@ -8,7 +6,6 @@ class Provider extends Base {
       block3 = data.block3;
       delete data.block3;
     }
-    super(data);
     this._block3 = block3;
   }
 
@@ -18,10 +15,6 @@ class Provider extends Base {
 
   get provider() {
     return this.block3.provider;
-  }
-
-  export() {
-    return this.export();
   }
 }
 

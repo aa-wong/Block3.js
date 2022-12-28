@@ -1,5 +1,13 @@
-class Base {
+import Provider from './provider';
+
+class Base extends Provider {
   constructor(data = {}) {
+    if (data.network) {
+      const { network } = data;
+
+      if (network.block3) data.block3 = network.block3;
+    }
+    super(data);
     this._ = {};
     this.update(data);
     this._callbacks = {};
@@ -27,12 +35,17 @@ class Base {
     return this;
   }
 
-  get export() {
-    return this._;
+  export() {
+    return Object.keys(this._).reduce((a, prop) => {
+      if (this._[prop].constructor === Base) a[prop] = this._[prop].export();
+      else a[prop] = this._[prop];
+
+      return a;
+    }, {});
   }
 
   exportJson() {
-    return JSON.parse(JSON.stringify(this.export));
+    return JSON.parse(JSON.stringify(this.export()));
   }
 
   _applyCallback(key, cb) {

@@ -7,6 +7,10 @@ class User extends Provider {
     this._callbacks
   }
 
+  connect() {
+    return this.provider.send("eth_requestAccounts", []);
+  }
+
   get signer() {
     return this.provider.getSigner();
   }
@@ -15,7 +19,7 @@ class User extends Provider {
     try {
       const address = await this.signer.getAddress();
 
-      return Promise.resolve(new Account({ provider: this.provider, address }));
+      return Promise.resolve(new Account({ block3: this.block3, address }));
     } catch(e) {
       return Promise.reject(e);
     }
@@ -25,14 +29,18 @@ class User extends Provider {
     return this.signer.signMessage(message);
   }
 
-  accounts() {
-    return this.provider.provider.listAccounts().map(a => {
-      return new Account({ ...this.export, address: a });
-    });
+  async accounts() {
+    try {
+      const accs = await this.provider.listAccounts();
+
+      return Promise.resolve(accs.map(a => new Account({ block3: this.block3, address: a })));
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   onAccountChange(cb) {
-    this.provider.provider.on('accountsChanged', a => {
+    this.provider.on('accountsChanged', a => {
       if (a.length < 1) {
         return this._handleDisconnect();
       }

@@ -1,12 +1,12 @@
-import ProviderCollection from '../provider-collection';
+import BaseCollection from '../../collection';
 import Block from './block';
 
-class Blocks extends ProviderCollection {
+class Blocks extends BaseCollection {
   constructor(data) {
     super(Block, data);
   }
 
-  async current(tx) {
+  async current() {
     try {
       const id = await this.currentNumber();
       const block = this.getByIndexValue('hash', id);
@@ -32,12 +32,21 @@ class Blocks extends ProviderCollection {
     }
   }
 
-  create(data) {
-    return super.create(data, 'hash');
+  getById(id) {
+    return super.getById(id, 'hash');
   }
 
-  createBatch(data, append) {
-    return super.createBatch(data, append, 'hash');
+  create(data) {
+    const block = this.getById(data.hash);
+
+    if (block) {
+      return block;
+    }
+    return super.create(Object.assign(data, { network: this.network }), 'hash');
+  }
+
+  createBatch(data) {
+    return super.createBatch(data, { network: this.network }, 'hash');
   }
 
   currentNumber() {

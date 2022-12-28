@@ -1,6 +1,14 @@
-class BaseCollection {
+import Provider from './provider';
+
+class Collection extends Provider {
   constructor(metaType, data) {
-    this._ = {};
+    if (data.network) {
+      const { network } = data;
+
+      if (network.block3) data.block3 = network.block3;
+    }
+    super(data);
+    this._ = Object.assign({index: {}}, data);
     this._items = [];
     this.MetaType = metaType;
 
@@ -9,27 +17,44 @@ class BaseCollection {
     }
   }
 
-  create(data, id) {
+  get(prop, _default) {
+    const o = this._[prop];
+
+    return o !== undefined ? o : _default;
+  }
+
+  set(prop, value, constructor) {
+    if (value && this.constructorValidator(value, constructor)) this._[prop] = value;
+  }
+
+  constructorValidator(value, constructor) {
+    if (constructor) {
+      return value.constructor === constructor
+    }
+    return true;
+  }
+
+  create(data, key) {
     let obj = null;
 
     if (data && data.constructor === Object) {
       obj = new this.MetaType(data);
       this._items.push(obj);
 
-      if (id !== undefined) {
-        if (this._[id] === undefined) this._[id] = {};
+      if (key !== undefined) {
+        if (this._.index[key] === undefined) this._.index[key] = {};
 
-        this._[id][obj._[id]] = obj;
+        this._.index[key][obj._[key]] = obj;
       }
     }
     return obj;
   }
 
-  createBatch(data, append = {}, id) {
+  createBatch(data, append = {}, key) {
     let set = [];
 
     if (data && data.constructor === Array) {
-      set = data.map(d => this.create({...d, ...append}, id));
+      set = data.map(d => this.create({...d, ...append}, key));
     }
     return set;
   }
@@ -66,12 +91,13 @@ class BaseCollection {
     return this._items.forEach(...args);
   }
 
-  getById(id) {
-    return this._.index.id[id] || this.find(item => item.id === id);
+  getById(id, key) {
+    if (!this._.index[key]) this._.index[key] = {};
+    return this._.index[key][id];
   }
 
   getByIndexValue(key, value) {
-    let index = this._[key];
+    let index = this._.index[key];
 
     if (index !== undefined) {
       return index[value];
@@ -105,8 +131,12 @@ class BaseCollection {
   }
 
   export() {
-    return JSON.parse(JSON.stringify({items: this.getAll()}));
+    return this.getAll().map(e => e.export());
+  }
+
+  exportJson() {
+    return JSON.parse(JSON.stringify({items: this.export()}));
   }
 }
 
-export default BaseCollection;
+export default Collection;
