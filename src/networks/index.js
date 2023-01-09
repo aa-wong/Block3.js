@@ -27,7 +27,6 @@ class Networks extends BaseCollection {
     try {
       const n = await this.provider.getNetwork();
 
-      console.log(n);
       return Promise.resolve(this.create(n));
     } catch (e) {
       return Promise.reject(e);
