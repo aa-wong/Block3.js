@@ -45,7 +45,7 @@ class User extends Provider {
         return this._handleDisconnect();
       }
       return cb(new Account({
-        provider: this.provider,
+        block3: this.block3,
         address: a[0]
       }));
     });
