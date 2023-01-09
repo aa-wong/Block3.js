@@ -32659,9 +32659,18 @@ class Contracts extends _collection__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }, 'address');
   }
 
-  async loadContract(address, index, xhr) {
+  async loadContract(address, abi, index, xhr) {
     if (!this.network) {
       return Promise.reject(new Error('Missing network reference'));
+    }
+
+    if (abi) {
+      const contract = this.create({
+        address,
+        network: this.network,
+        abi
+      });
+      return Promise.resolve(contract);
     }
 
     const {
@@ -32673,7 +32682,7 @@ class Contracts extends _collection__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
 
     try {
-      const abi = await blockscan.getAbi(address, index, xhr);
+      abi = await blockscan.getAbi(address, index, xhr);
       const contract = this.create({
         address,
         network: this.network,
