@@ -32837,7 +32837,6 @@ class Networks extends _collection__WEBPACK_IMPORTED_MODULE_0__["default"] {
   async current() {
     try {
       const n = await this.provider.getNetwork();
-      console.log(n);
       return Promise.resolve(this.create(n));
     } catch (e) {
       return Promise.reject(e);
@@ -32892,11 +32891,12 @@ class Networks extends _collection__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   onChange(cb) {
-    return this.provider.on('network', (newNetwork, oldNetwork) => {
+    this.provider.on('network', (newNetwork, oldNetwork) => {
       if (oldNetwork) {
         return cb(this.create(newNetwork), this.create(oldNetwork));
       }
     });
+    return this;
   }
 
 }
@@ -33310,7 +33310,7 @@ class User extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
       }
 
       return cb(new _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]({
-        provider: this.provider,
+        block3: this.block3,
         address: a[0]
       }));
     });
@@ -33318,7 +33318,9 @@ class User extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   onDisconnect(cb) {
-    return this._applyCallback('onDisconnect', cb);
+    this._applyCallback('onDisconnect', cb);
+
+    return this;
   }
 
   _handleDisconnect(e) {

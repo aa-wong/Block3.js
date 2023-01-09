@@ -84,11 +84,13 @@ class Networks extends BaseCollection {
   }
 
   onChange(cb) {
-    return this.provider.on('network', (newNetwork, oldNetwork) => {
+    this.provider.on('network', (newNetwork, oldNetwork) => {
       if (oldNetwork) {
         return cb(this.create(newNetwork), this.create(oldNetwork));
       }
     });
+
+    return this;
   }
 }
 

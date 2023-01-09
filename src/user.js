@@ -54,7 +54,8 @@ class User extends Provider {
   }
 
   onDisconnect(cb) {
-    return this._applyCallback('onDisconnect', cb);
+    this._applyCallback('onDisconnect', cb);
+    return this;
   }
 
   _handleDisconnect(e) {
