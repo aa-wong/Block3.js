@@ -31524,7 +31524,6 @@ class Base extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
     super(data);
     this._ = {};
     this.update(data);
-    this._callbacks = {};
   }
 
   get(prop, _default) {
@@ -31558,14 +31557,6 @@ class Base extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   exportJson() {
     return JSON.parse(JSON.stringify(this.export()));
-  }
-
-  _applyCallback(key, cb) {
-    if (typeof cb === 'function') {
-      this._callbacks[key] = e => cb(e);
-    }
-
-    return this;
   }
 
 }
@@ -32185,7 +32176,8 @@ class Blocks extends _collection__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   onChange(cb) {
-    return this.provider.on("block", n => cb(n));
+    this.provider.on("block", n => cb(n));
+    return this;
   }
 
 }
@@ -32288,7 +32280,6 @@ class Contract extends _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]
   constructor(data = {}) {
     super(data);
     this._currentNetwork = this.network;
-    this._callbacks = {};
     this._functionIndex = {};
     this._eventIndex = {};
     this.abi = data.abi;
@@ -32479,13 +32470,13 @@ class Contract extends _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]
 
   event(abiName, cb) {
     if (this._currentNetwork.chainId !== this.network.chainId) {
-      return Promise.reject(new Error('Incompatible current network.'));
+      throw new Error('Incompatible current network.');
     }
 
     const abi = this._eventIndex[abiName];
 
     if (!abi || !cb || typeof cb !== 'function') {
-      return Promise.reject(new Error('abi and valid callback function is required.'));
+      throw new Error('abi and valid callback function is required.');
     }
 
     const {
@@ -32494,15 +32485,11 @@ class Contract extends _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]
     } = abi;
 
     if (type !== 'event') {
-      return Promise.reject(new Error('Invalid ABI. Should be of type `event`'));
+      throw new Error('Invalid ABI. Should be of type `event`');
     }
 
     this.contract.on(name, cb);
-    return Promise.resolve(this);
-  }
-
-  resetCallbacks() {
-    this._callbacks = {};
+    return this;
   }
 
   export() {
@@ -33256,17 +33243,12 @@ class Provider {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _provider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./provider */ "./src/provider.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/base.js");
 /* harmony import */ var _accounts_account__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./accounts/account */ "./src/accounts/account.js");
 
 
 
-class User extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  constructor(data) {
-    super(data);
-    this._callbacks;
-  }
-
+class User extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
   connect() {
     return this.provider.send("eth_requestAccounts", []);
   }
@@ -33305,10 +33287,6 @@ class User extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   onAccountChange(cb) {
     this.provider.on('accountsChanged', a => {
-      if (a.length < 1) {
-        return this._handleDisconnect();
-      }
-
       return cb(new _accounts_account__WEBPACK_IMPORTED_MODULE_1__["default"]({
         block3: this.block3,
         address: a[0]
@@ -33317,18 +33295,18 @@ class User extends _provider__WEBPACK_IMPORTED_MODULE_0__["default"] {
     return this;
   }
 
-  onDisconnect(cb) {
-    this._applyCallback('onDisconnect', cb);
-
+  onConnect(cb) {
+    this.provider.on('connect', info => {
+      return cb(this, info);
+    });
     return this;
   }
 
-  _handleDisconnect(e) {
-    const cb = this._callbacks.onDisconnect;
-
-    if (cb) {
-      return cb();
-    }
+  onDisconnect(cb) {
+    this.provider.on('disconnect', error => {
+      return cb(error);
+    });
+    return this;
   }
 
 }

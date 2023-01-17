@@ -1,12 +1,7 @@
-import Provider from './provider';
+import Base from './base';
 import Account from './accounts/account';
 
-class User extends Provider {
-  constructor(data) {
-    super(data);
-    this._callbacks
-  }
-
+class User extends Base {
   connect() {
     return this.provider.send("eth_requestAccounts", []);
   }
@@ -41,9 +36,6 @@ class User extends Provider {
 
   onAccountChange(cb) {
     this.provider.on('accountsChanged', a => {
-      if (a.length < 1) {
-        return this._handleDisconnect();
-      }
       return cb(new Account({
         block3: this.block3,
         address: a[0]
@@ -53,17 +45,20 @@ class User extends Provider {
     return this;
   }
 
-  onDisconnect(cb) {
-    this._applyCallback('onDisconnect', cb);
+  onConnect(cb) {
+    this.provider.on('connect', (info) => {
+      return cb(this, info);
+    });
+
     return this;
   }
 
-  _handleDisconnect(e) {
-    const cb = this._callbacks.onDisconnect;
+  onDisconnect(cb) {
+    this.provider.on('disconnect', (error) => {
+      return cb(error);
+    });
 
-    if (cb) {
-      return cb();
-    }
+    return this;
   }
 }
 export default User;

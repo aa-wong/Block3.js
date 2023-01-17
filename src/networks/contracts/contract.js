@@ -6,7 +6,6 @@ class Contract extends Account {
   constructor(data = {}) {
     super(data);
     this._currentNetwork = this.network;
-    this._callbacks = {};
     this._functionIndex = {};
     this._eventIndex = {};
     this.abi = data.abi;
@@ -197,12 +196,12 @@ class Contract extends Account {
 
   event(abiName, cb) {
     if (this._currentNetwork.chainId !== this.network.chainId) {
-      return Promise.reject(new Error('Incompatible current network.'));
+      throw new Error('Incompatible current network.');
     }
     const abi = this._eventIndex[abiName];
 
     if (!abi || !cb || typeof cb !== 'function') {
-      return Promise.reject(new Error('abi and valid callback function is required.'));
+      throw new Error('abi and valid callback function is required.');
     }
     const {
       name,
@@ -210,15 +209,11 @@ class Contract extends Account {
     } = abi;
 
     if (type !== 'event') {
-      return Promise.reject(new Error('Invalid ABI. Should be of type `event`'));
+      throw new Error('Invalid ABI. Should be of type `event`');
     }
 
     this.contract.on(name, cb);
-    return Promise.resolve(this);
-  }
-
-  resetCallbacks() {
-    this._callbacks = {};
+    return this;
   }
 
   export() {

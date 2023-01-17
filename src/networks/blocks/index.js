@@ -70,7 +70,8 @@ class Blocks extends BaseCollection {
   }
 
   onChange(cb) {
-    return this.provider.on("block", n => cb(n));
+    this.provider.on("block", n => cb(n));
+    return this;
   }
 }
 

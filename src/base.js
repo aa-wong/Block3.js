@@ -10,7 +10,6 @@ class Base extends Provider {
     super(data);
     this._ = {};
     this.update(data);
-    this._callbacks = {};
   }
 
   get(prop, _default) {
@@ -46,13 +45,6 @@ class Base extends Provider {
 
   exportJson() {
     return JSON.parse(JSON.stringify(this.export()));
-  }
-
-  _applyCallback(key, cb) {
-    if (typeof cb === 'function') {
-      this._callbacks[key] = e => cb(e);
-    }
-    return this;
   }
 }
 
