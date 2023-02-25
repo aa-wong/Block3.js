@@ -1,7 +1,7 @@
 {
   "name": "Block3",
   "version": "2.0.0",
-  "description": "Block3 - a front Javascript Library to easily manage Web3 interactions with Smart Contracts",
+  "description": "Block3 - a frontend Javascript Library to easily manage Web3 interactions with Smart Contracts",
   "main": "lib/block3.js",
   "files": [
     "src/",
