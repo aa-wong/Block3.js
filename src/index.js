@@ -60,12 +60,4 @@ class Block3 extends Base {
   }
 }
 
-(_export => {
-  try {
-    window.Block3 = _export;
-  } catch (e) {
-    module.exports = _export;
-  }
-})(Block3);
-
 export default Block3;
